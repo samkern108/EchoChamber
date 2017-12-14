@@ -98,6 +98,7 @@ public class PlayerController : MonoBehaviour {
 			if (Input.GetKeyDown (KeyCode.UpArrow)) {
 				_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
 				_animator.Play( "Jump" );
+				AudioManager.PlayPlayerJump ();
 			}
 		}
 		else {
@@ -137,6 +138,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void FlipPlayer() {
+		AudioManager.PlayPlayerTurn ();
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
 
 		// Fixes the sprite not flipping due to animator issues. If we can flip the sprite in the animator, that will be a lot easier.

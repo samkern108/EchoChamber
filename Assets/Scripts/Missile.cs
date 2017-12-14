@@ -36,7 +36,7 @@ public class Missile : MonoBehaviour {
 			Vector2 reflection = Vector2.Reflect (moveVector.normalized, hit.normal);
 			explosion.transform.rotation = Quaternion.LookRotation(reflection,Vector3.up);
 
-			//AudioManager.PlayProjectileExplode ();
+			AudioManager.PlayProjectileExplode ();
 		}
 
 		Destroy (gameObject);

@@ -13,6 +13,7 @@ public class Exit : MonoBehaviour, IRestartObserver {
 
 	void OnTriggerEnter2D(Collider2D coll) {
 		if (!activated) {
+			AudioManager.PlayDotPickup ();
 			activated = true;
 			EnemyManager.self.SpawnEnemy ();
 			RepositionExit ();

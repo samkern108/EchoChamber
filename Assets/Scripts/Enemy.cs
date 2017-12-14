@@ -99,6 +99,7 @@ public class Enemy : MonoBehaviour {
 	}
 
 	private void Shoot() {
+		AudioManager.PlayEnemyShoot ();
 		animator.Play ("Shoot");
 		Vector3 direction = (PlayerController.PlayerPosition - transform.position).normalized;
 		GameObject missile = Instantiate (projectile);

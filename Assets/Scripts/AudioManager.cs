@@ -1,22 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using MovementEffects;
+using MovementEffects;
 
 public class AudioManager : MonoBehaviour {
 
 	public static AudioManager instance;
 
 	public static AudioClip projectileShoot, projectileExplode, 
-	playerBoostCharge, playerBoostRelease, playerWallHit, playerTurn, playerMove, playerDeath,
+	playerBoostCharge, playerBoostRelease, playerWallHit, playerTurn, playerJump, playerDeath,
 	levelComplete, gameStart, 
 	dotPickup;
 
 	private static GameObject sourceTemplate;
 	private static int activeSources = 0;
 	private static List<AudioSource> freeSources = new List<AudioSource>();
-
-	public static AudioSource dotAS, playerAS, playerMoveAS;
 
 	// ## Initialization >> //
 
@@ -28,10 +26,6 @@ public class AudioManager : MonoBehaviour {
 		sourceTemplate.AddComponent <AudioSource>();
 		sourceTemplate.transform.SetParent (this.transform);
 
-		dotAS = transform.Find ("DotAS").GetComponent<AudioSource>();
-		playerAS = transform.Find ("PlayerAS").GetComponent<AudioSource>();
-		//playerMoveAS = transform.FindChild ("PlayerMoveAS").GetComponent<AudioSource>();
-
 		Initialize ();
 	}
 
@@ -42,8 +36,8 @@ public class AudioManager : MonoBehaviour {
 		playerBoostCharge = ResourceLoader.LoadAudioClip ("Player Boost Charge");
 		playerBoostRelease = ResourceLoader.LoadAudioClip ("Player Boost 6");
 		playerWallHit = ResourceLoader.LoadAudioClip ("Player Wall Hit");
-		//playerMove = ResourceLoader.LoadAudioClip ("Player Move");
 		playerTurn = ResourceLoader.LoadAudioClip ("Player Turn");
+		playerJump = ResourceLoader.LoadAudioClip ("Player Move 2");
 		playerDeath = ResourceLoader.LoadAudioClip ("Player Death");
 		levelComplete = ResourceLoader.LoadAudioClip ("Level Complete");
 		gameStart = ResourceLoader.LoadAudioClip ("Game Start");
@@ -55,26 +49,24 @@ public class AudioManager : MonoBehaviour {
 	// ## Audio Source Handling >> //
 
 	private static AudioSource GetFreeAudioSource(float recycleTime) {
-		/*if (freeSources.Count == 0) {
+		AudioSource source;
+		if (freeSources.Count == 0) {
 			GameObject obj = Instantiate (sourceTemplate);
 			obj.transform.SetParent (AudioManager.instance.transform);
 			activeSources++;
-			return obj.GetComponent <AudioSource>();
+			source = obj.GetComponent <AudioSource>();
 		}
 		else {
 			// Race condition?
-			AudioSource source = freeSources[0];
+			source = freeSources[0];
 			freeSources.RemoveAt (0);
-			// Figure out a better way to determine if sources can be removed.
+			// TODO: Figure out a better way to determine if sources can be removed.
 			if (freeSources.Count >= (int)Mathf.Ceil (activeSources / 2)) {
 				freeSources.RemoveRange (0, (int)Mathf.Floor (activeSources / 2));
 			}
-			Timing.RunCoroutine (RecycleSource(recycleTime + .1f, source));
-			return source;
-		}*/
-		GameObject obj = Instantiate (sourceTemplate);
-		obj.transform.SetParent (AudioManager.instance.transform);
-		return obj.GetComponent <AudioSource>();
+		}
+		Timing.RunCoroutine (RecycleSource(recycleTime + .1f, source));
+		return source;
 	}
 
 	private static IEnumerator<float> RecycleSource (float wait, AudioSource source) {
@@ -84,83 +76,44 @@ public class AudioManager : MonoBehaviour {
 	}
 
 	// << Audio Source Handling ## //
-
-	// ## Dot SFX >> //
-	private static bool resetPickup = true;
-	public void N_LevelLoaded(int level) {
-		resetPickup = true;
-	}
-
-	public void PlayDotPickup() {
-		if (resetPickup) {
-			resetPickup = false;
-			dotAS.pitch = .55f;
-		}
-
-		dotAS.volume = .7f;
-		dotAS.PlayOneShot (dotPickup);
-		dotAS.pitch += .26f;
-	}
-
-	// << Dot SFX ## //
-
+		
 	// ## Player SFX >> //
 
-	public static void PlayPlayerDeath() {
-		playerAS.volume = .9f;
-		playerAS.pitch = Random.Range (.8f, 1.1f);
-		playerAS.PlayOneShot (playerDeath);
+	public static void PlayEnemyDeath() {
+		AudioSource source = GetFreeAudioSource (dotPickup.length);
+		source.volume = .2f;
+		source.pitch = Random.Range (1f, 1.3f);
+		source.PlayOneShot (playerDeath);
 	}
 
-	private static bool playerTurnSafeToPlay = true;
+	public static void PlayPlayerDeath() {
+		AudioSource source = GetFreeAudioSource (dotPickup.length);
+		source.volume = .6f;
+		source.pitch = Random.Range (.8f, 1.1f);
+		source.PlayOneShot (playerDeath);
+	}
+		
+	public static void PlayPlayerJump() {
+		AudioSource source = GetFreeAudioSource (playerJump.length);
+		source.volume = .9f;
+		source.pitch = Random.Range (.8f, 1.1f);
+		source.PlayOneShot (playerJump);
+	}
+
+	/*private static bool playerTurnSafeToPlay = true;
 	private void PlayerTurnSafeToPlay() {
 		playerTurnSafeToPlay = true;
-	}
+	}*/
 
 	public static void PlayPlayerTurn() {
-		if (!playerTurnSafeToPlay) return;
-		playerTurnSafeToPlay = false;
-		playerAS.volume = Random.Range(.2f, .4f);
-		playerAS.pitch = Random.Range(.6f, .8f);
-		playerAS.PlayOneShot (playerTurn);
-		AudioManager.instance.Invoke ("PlayerTurnSafeToPlay", playerTurn.length/3);
+		//if (!playerTurnSafeToPlay) return;
+		//playerTurnSafeToPlay = false;
+		AudioSource source = GetFreeAudioSource (dotPickup.length);
+		source.volume = Random.Range(.2f, .3f);
+		source.pitch = Random.Range(.6f, .8f);
+		source.PlayOneShot (playerTurn);
+		//AudioManager.instance.Invoke ("PlayerTurnSafeToPlay", playerTurn.length/3);
 	}
-
-	public static void PlayPlayerBoostCharge() {
-		playerAS.PlayOneShot (playerBoostCharge);
-	}
-
-	public static void PlayPlayerBoostRelease(float strength, float volume) {
-		playerAS.PlayOneShot (playerBoostRelease);
-		playerAS.volume = volume;
-		playerAS.pitch = strength;
-	}
-
-	private static bool wallHitSafeToPlay = true;
-	private void WallHitSafeToPlay() {
-		wallHitSafeToPlay = true;
-	}
-
-	public static void PlayPlayerWallHit() {
-		if (!wallHitSafeToPlay) return;
-
-		playerAS.volume = .9f;
-		playerAS.pitch = Random.Range (.8f, 1.2f);
-		playerAS.PlayOneShot (playerTurn);
-		wallHitSafeToPlay = false;
-		AudioManager.instance.Invoke ("WallHitSafeToPlay", .2f);
-	}
-
-	/*private static bool playPlayerMove = false;
-
-	public void PlayPlayerMove(bool play) {
-		playPlayerMove = play;
-	}
-
-	private void RepeatPlayerMove() {
-		if(playPlayerMove)
-			playerMoveAS.PlayOneShot (playerMove);
-	}*/
 
 	// << Player SFX ## //
 
@@ -188,4 +141,11 @@ public class AudioManager : MonoBehaviour {
 	}
 
 	// << Enemy SFX ## //
+
+	public static void PlayDotPickup() {
+		AudioSource source = GetFreeAudioSource (dotPickup.length);
+		source.pitch = .75f;
+		source.volume = .7f;
+		source.PlayOneShot (dotPickup);
+	}
 }

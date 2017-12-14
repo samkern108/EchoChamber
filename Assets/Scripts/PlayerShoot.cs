@@ -22,6 +22,7 @@ public class PlayerShoot : MonoBehaviour {
 		bool fire = Input.GetKeyDown (KeyCode.Space);
 
 		if (fire) {
+			AudioManager.PlayEnemyShoot ();
 			animator.Play("Shoot");
 
 			float direction = PlayerController.spriteFlipped ? -1 : 1;

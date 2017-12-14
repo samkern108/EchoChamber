@@ -69,6 +69,7 @@ public class Ghost : MonoBehaviour {
 
 	// Lot of duplicate shoot code
 	private void Shoot() {
+		AudioManager.PlayEnemyShoot ();
 		animator.speed = 1.0f;
 		float direction = spriteFlipped ? -1 : 1;
 		GameObject missile = Instantiate (projectile);
