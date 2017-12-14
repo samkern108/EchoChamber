@@ -16,6 +16,8 @@ public class Ghost : MonoBehaviour {
 	private int positionIndex = 0;
 	private int shootIndex = 0;
 
+	private float shootTelemarkTime = .5f;
+
 	private bool spriteFlipped = false;
 
 	private Animator animator;
@@ -33,19 +35,11 @@ public class Ghost : MonoBehaviour {
 	public void EnactRoutine () {
 		animator.Play ("Appear");
 
-		Color newColor = GetComponent <SpriteRenderer> ().color;
-		newColor.a -= .1f;
-		if(newColor.a <= 0) {
-			GhostManager.instance.children.Remove (this);
-			GameObject.Destroy (this.gameObject);
-		}
-		GetComponent <SpriteRenderer> ().color = newColor;
-
 		active = true;
 		positionIndex = 0;
 		shootIndex = 0;
 		if (shootIndex < shootTimes.Length) {
-			Invoke ("Shoot", shootTimes [shootIndex]);
+			Invoke ("Shoot", shootTimes [shootIndex]);// - shootTelemarkTime);
 		}
 	}
 
@@ -54,7 +48,7 @@ public class Ghost : MonoBehaviour {
 			float oldx = transform.position.x;
 			transform.position = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
 
-			if (transform.position.x != oldx) {
+			if (Mathf.Abs(transform.position.x - oldx) >= .1f) {
 				float sign = Mathf.Sign (transform.position.x - oldx);
 
 				if ((sign == -1f && !spriteFlipped) || (sign == 1f && spriteFlipped)) {
@@ -67,10 +61,15 @@ public class Ghost : MonoBehaviour {
 		}
 	}
 
+	private void TelemarkShoot() {
+		animator.speed = .8f;
+		animator.Play ("Shoot");
+		//Invoke ("Shoot", shootTelemarkTime);
+	}
+
 	// Lot of duplicate shoot code
 	private void Shoot() {
-		animator.Play ("Shoot");
-
+		animator.speed = 1.0f;
 		float direction = spriteFlipped ? -1 : 1;
 		GameObject missile = Instantiate (projectile);
 		missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);

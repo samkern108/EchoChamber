@@ -19,11 +19,13 @@ public class PlayerController : MonoBehaviour {
 	private float inAirDamping = 5f;
 	private float jumpHeight = 3f;
 
+	private float normalizedHorizontalSpeed = 0;
+
+	public static int index = 0;
+	public static float[] ghostPositions = new float[500];
+
 	// A non-flipped PlayerTemp sprite faces right
 	public static bool spriteFlipped = false;
-
-	[HideInInspector]
-	public float normalizedHorizontalSpeed = 0;
 
 	private CharacterController2D _controller;
 	private Animator _animator;
@@ -36,10 +38,7 @@ public class PlayerController : MonoBehaviour {
 		_animator = GetComponent<Animator>();
 		_controller = GetComponent<CharacterController2D>();
 
-		// listen to some events for illustration purposes
-		_controller.onControllerCollidedEvent += onControllerCollider;
 		_controller.onTriggerEnterEvent += onTriggerEnterEvent;
-		_controller.onTriggerExitEvent += onTriggerExitEvent;
 
 		PlayerTransform = transform;
 
@@ -48,16 +47,6 @@ public class PlayerController : MonoBehaviour {
 
 
 	#region Event Listeners
-
-	void onControllerCollider( RaycastHit2D hit )
-	{
-		// bail out on plain old ground hits cause they arent very interesting
-		if( hit.normal.y == 1f )
-			return;
-
-		// logs any collider hits if uncommented. it gets noisy so it is commented out for the demo
-		//Debug.Log( "flags: " + _controller.collisionState + ", hit.normal: " + hit.normal );
-	}
 
 	private bool activated = false;
 	void onTriggerEnterEvent( Collider2D col )
@@ -73,16 +62,12 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	private void Deactivate () {
+	#endregion
+
+	// Just so the player can't touch exits twice
+	public void Deactivate() {
 		activated = false;
 	}
-
-	void onTriggerExitEvent( Collider2D col )
-	{
-		//Debug.Log( "onTriggerExitEvent: " + col.gameObject.name );
-	}
-
-	#endregion
 
 
 	// the Update loop contains a very simple example of moving the character around and controlling the animation
@@ -93,27 +78,16 @@ public class PlayerController : MonoBehaviour {
 			normalizedHorizontalSpeed = 1;
 			if (spriteFlipped)
 				FlipPlayer ();
-
-			//if( _controller.isGrounded )
-			//	_animator.Play( "Run" );
 		}
 		else if( Input.GetKey( KeyCode.LeftArrow ) )
 		{
 			normalizedHorizontalSpeed = -1;
 			if (!spriteFlipped)
 				FlipPlayer ();
-
-			//if( _controller.isGrounded )
-			//	_animator.Play( "Run" );
 		}
 		else
 		{
 			normalizedHorizontalSpeed = 0;
-
-			//if( _controller.isGrounded )
-				//_animator.Play( Animator.StringToHash( "Idle" ) );
-				//_animator.Play( "Idle" );
-
 		}
 
 		if (_controller.isGrounded) {
@@ -167,11 +141,8 @@ public class PlayerController : MonoBehaviour {
 
 		// Fixes the sprite not flipping due to animator issues. If we can flip the sprite in the animator, that will be a lot easier.
 		spriteFlipped = !spriteFlipped;
-		GetComponent <SpriteRenderer>().flipX = spriteFlipped;
+		//GetComponent <SpriteRenderer>().flipX = spriteFlipped;
 	}
-
-	public static int index = 0;
-	public static float[] ghostPositions = new float[500];
 
 	private static Transform _playerTransform;
 	public static Transform PlayerTransform
