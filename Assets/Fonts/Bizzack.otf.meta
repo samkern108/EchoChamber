@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: baac4b13ff4a74269ba247dc669af5c9
+timeCreated: 1513297059
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Bizzack
+  fontNames:
+  - Bizzack
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

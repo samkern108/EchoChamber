@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 059be0d37c8384553ae9910186f2d4e1
+timeCreated: 1513297158
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: regosel
+  fontNames:
+  - regosel
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 04585d6a2318d418b92e9fa87183b5e9
+timeCreated: 1513297113
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Caricature.fr
+  fontNames:
+  - Caricature.fr
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

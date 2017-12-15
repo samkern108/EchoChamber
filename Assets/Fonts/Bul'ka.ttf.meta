@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: a6c84745973c54e7f9cfbfad8dbd6597
+timeCreated: 1513297074
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Bul"ka
+  fontNames:
+  - Bul"ka
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

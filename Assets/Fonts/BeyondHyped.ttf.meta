@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: cfc01b612f99446ab9cc3b6e31c33e2b
+timeCreated: 1513297055
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: BeyondHyped
+  fontNames:
+  - BeyondHyped
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

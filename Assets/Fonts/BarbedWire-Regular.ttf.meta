@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 60f9e1d2f730d48fe99f947e3d9353ba
+timeCreated: 1513297045
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: BarbedWire
+  fontNames:
+  - BarbedWire
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
