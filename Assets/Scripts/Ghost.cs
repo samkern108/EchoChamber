@@ -48,7 +48,7 @@ public class Ghost : MonoBehaviour {
 			float oldx = transform.position.x;
 			transform.position = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
 
-			if (Mathf.Abs(transform.position.x - oldx) >= .1f) {
+			if (Mathf.Abs(transform.position.x - oldx) >= .5f) {
 				float sign = Mathf.Sign (transform.position.x - oldx);
 
 				if ((sign == -1f && !spriteFlipped) || (sign == 1f && spriteFlipped)) {
