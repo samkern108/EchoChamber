@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using Prime31;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour, IRestartObserver {
 
 	// Tells us what our collison state was in the last frame
 	public CharacterController2D.CharacterCollisionState2D flags;
@@ -21,9 +21,6 @@ public class PlayerController : MonoBehaviour {
 
 	private float normalizedHorizontalSpeed = 0;
 
-	public static int index = 0;
-	public static float[] ghostPositions = new float[500];
-
 	// A non-flipped PlayerTemp sprite faces right
 	public static bool spriteFlipped = false;
 
@@ -32,19 +29,29 @@ public class PlayerController : MonoBehaviour {
 	private RaycastHit2D _lastControllerColliderHit;
 	public Vector3 _velocity;
 
+	public GameObject projectile;
+	private float playerWidth;
+	private float projectileSpeed = 8.0f;
+
+	private static int index = 0;
+	public static float[] ghostActions = new float[500];
+
 
 	void Awake()
 	{
+		NotificationMaster.restartObservers.Add (this);
 		_animator = GetComponent<Animator>();
 		_controller = GetComponent<CharacterController2D>();
 
 		_controller.onTriggerEnterEvent += onTriggerEnterEvent;
 
 		PlayerTransform = transform;
-
-		_animator.Play("Appear");
+		playerWidth = GetComponent <SpriteRenderer> ().bounds.extents.x * 2.0f;
 	}
 
+	public void OnEnable() {
+		_animator.Play("Appear");
+	}
 
 	#region Event Listeners
 
@@ -54,10 +61,10 @@ public class PlayerController : MonoBehaviour {
 		if (col.tag == "Exit") {
 			activated = true;
 			float[] ghostPositionsChopped = new float[index + 1];
-			Array.Copy (ghostPositions, ghostPositionsChopped, index);
-			ghostPositions = new float[500];
+			Array.Copy (ghostActions, ghostPositionsChopped, index);
+			ghostActions = new float[500];
 			index = 0;
-			GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped, GetComponent<PlayerShoot>().GetShootTimes());
+			GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped);
 			Invoke ("Deactivate", .5f);
 		}
 	}
@@ -126,17 +133,35 @@ public class PlayerController : MonoBehaviour {
 
 		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
+
+		bool fire = Input.GetKeyDown (KeyCode.Space);
+
+		if (fire) {
+			AudioManager.PlayEnemyShoot ();
+			_animator.Play("Shoot");
+
+			float direction = spriteFlipped ? -1 : 1;
+			GameObject missile = Instantiate (projectile);
+			missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
+			missile.GetComponent <Missile>().Initialize(Vector3.right * direction, projectileSpeed);
+
+			shoot = true;
+		}
 	}
 
-	public void FixedUpdate() {
-		ghostPositions [index++] = transform.position.x;
-		ghostPositions [index++] = transform.position.y;
-		ghostPositions [index++] = spriteFlipped ? 1 : -1;
+	private bool shoot = false;
 
-		if (index >= ghostPositions.Length - 3) {
-			float[] temp = new float[ghostPositions.Length * 2];
-			ghostPositions.CopyTo(temp, 0);
-			ghostPositions = temp;
+	public void FixedUpdate() {
+		ghostActions [index++] = transform.position.x;
+		ghostActions [index++] = transform.position.y;
+		ghostActions [index++] = spriteFlipped ? 1 : -1;
+		ghostActions [index++] = shoot ? 1 : -1;
+		shoot = false;
+
+		if (index >= ghostActions.Length - 4) {
+			float[] temp = new float[ghostActions.Length * 2];
+			ghostActions.CopyTo(temp, 0);
+			ghostActions = temp;
 		}
 	}
 		
@@ -156,5 +181,11 @@ public class PlayerController : MonoBehaviour {
 	}
 	public static Vector3 PlayerPosition {
 		get { return _playerTransform.position; }
+	}
+
+	public void Restart() {
+		transform.position = Vector3.zero;
+		gameObject.SetActive (true);
+		ghostActions = new float[500];
 	}
 }

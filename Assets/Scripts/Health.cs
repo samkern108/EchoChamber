@@ -27,11 +27,12 @@ public class Health : MonoBehaviour {
 
 	private void Die() {
 		if (gameObject.tag == "Player") {
+			NotificationMaster.SendPlayerDeathNotification ();
 			AudioManager.PlayPlayerDeath ();
-			UIManager.instance.Stop ();
+			gameObject.SetActive (false);
 		} else {
 			AudioManager.PlayEnemyDeath ();
+			GameObject.Destroy (this.gameObject);
 		}
-		GameObject.Destroy (this.gameObject);
 	}
 }

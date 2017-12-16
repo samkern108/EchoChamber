@@ -33,18 +33,4 @@ public class Room : MonoBehaviour {
 
 		return point;
 	}
-
-	/*public static Vector3 WrapWithinRoom(Vector3 newPosition) {
-		if (newPosition.x < bounds.min.x)
-			newPosition.x = bounds.max.x;
-		else if (newPosition.x > bounds.max.x)
-			newPosition.x = bounds.min.x;
-
-		if (newPosition.y < bounds.min.y)
-			newPosition.y = bounds.max.y;
-		else if (newPosition.y > bounds.max.y)
-			newPosition.y = bounds.min.y;
-
-		return newPosition;
-	}*/
 }

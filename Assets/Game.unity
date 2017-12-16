@@ -868,8 +868,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGrounded: 0
   isJumping: 0
-  normalizedHorizontalSpeed: 0
   _velocity: {x: 0, y: 0, z: 0}
+  projectile: {fileID: 1272349653017708, guid: 4ff87c81b8f254517a594b99684a602f, type: 2}
 --- !u!114 &510227335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -971,7 +971,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 510227331}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52e16d48f1a8c4aaab73a20a9f3b8466, type: 3}
   m_Name: 
@@ -1518,6 +1518,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1150657084}
   - component: {fileID: 1150657083}
+  - component: {fileID: 1150657085}
   m_Layer: 0
   m_Name: _WORLD
   m_TagString: Untagged
@@ -1549,6 +1550,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1150657085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1150657082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61d33cd4c83114edebd9137b55cce839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1218855197
 GameObject:
   m_ObjectHideFlags: 0
@@ -5539,7 +5551,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   exitsText: {fileID: 488613407}
-  timerText: {fileID: 599540639}
 --- !u!1 &2026260766
 GameObject:
   m_ObjectHideFlags: 0

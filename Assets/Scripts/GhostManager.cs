@@ -13,12 +13,12 @@ public class GhostManager : MonoBehaviour, IRestartObserver {
 		NotificationMaster.restartObservers.Add (this);
 	}
 
-	public void StartCapturingNewGhost(float[] ghostPositions, float[] shootTimes) {
+	public void StartCapturingNewGhost(float[] ghostPositions) {
 
 		// Create new ghost
 		GameObject ghost = GameObject.Instantiate (p_ghost);
 		ghost.transform.SetParent(transform);
-		ghost.GetComponent <Ghost>().Initialize(ghostPositions, shootTimes);
+		ghost.GetComponent <Ghost>().Initialize(ghostPositions);
 		children.Add (ghost.GetComponent <Ghost>());
 
 		// Restart ghost routines
@@ -27,16 +27,8 @@ public class GhostManager : MonoBehaviour, IRestartObserver {
 		}
 	}
 
-	// TODO(samkern): Will these be out of order?
-	/*public void RegisterAction(GhostAction action) {
-		int index = actions.Count;
-		if (actions [index - 1].time > action.time) {
-			index--;
-		}
-		actions.Insert (index, action);
-	}*/
-
 	public void Restart() {
+		children.Clear ();
 		while (transform.childCount > 0) {
 			Transform child = transform.GetChild (0);
 			child.parent = null;

@@ -12,9 +12,7 @@ public class Ghost : MonoBehaviour {
 	private Vector2 moveInput;
 
 	private float[] positions;
-	private float[] shootTimes;
 	private int positionIndex = 0;
-	private int shootIndex = 0;
 
 	private float shootTelemarkTime = .5f;
 
@@ -22,9 +20,8 @@ public class Ghost : MonoBehaviour {
 
 	private Animator animator;
 
-	public void Initialize (float[] positions, float[] shootTimes) {
+	public void Initialize (float[] positions) {
 		this.positions = positions;
-		this.shootTimes = shootTimes;
 
 		spriteFlipped = false;
 		playerWidth = GetComponent <SpriteRenderer> ().bounds.extents.x * 2.0f;
@@ -37,10 +34,10 @@ public class Ghost : MonoBehaviour {
 
 		active = true;
 		positionIndex = 0;
-		shootIndex = 0;
+		/*shootIndex = 0;
 		if (shootIndex < shootTimes.Length) {
 			Invoke ("Shoot", shootTimes [shootIndex]);// - shootTelemarkTime);
-		}
+		}*/
 	}
 
 	public void FixedUpdate() {
@@ -51,6 +48,9 @@ public class Ghost : MonoBehaviour {
 			if (positions[positionIndex++] != (spriteFlipped ? 1 : -1)) {
 				spriteFlipped = !spriteFlipped;
 				GetComponent<SpriteRenderer> ().flipX = spriteFlipped;
+			}
+			if (positions [positionIndex++] == 1) {
+				Shoot ();
 			}
 		} else if(active) {
 			StopRoutine ();
@@ -71,11 +71,6 @@ public class Ghost : MonoBehaviour {
 		GameObject missile = Instantiate (projectile);
 		missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
 		missile.GetComponent <Missile>().Initialize(Vector3.right * direction, 8.0f);
-
-		shootIndex++;
-		if (shootIndex < shootTimes.Length) {
-			Invoke ("Shoot", shootTimes [shootIndex]);
-		}
 	}
 
 	public void StopRoutine() {

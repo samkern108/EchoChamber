@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyManager : MonoBehaviour, IRestartObserver {
+public class EnemyManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 
 	public static EnemyManager self;
 	public GameObject p_enemy;
@@ -11,6 +11,7 @@ public class EnemyManager : MonoBehaviour, IRestartObserver {
 	public void Start() {
 		self = this;
 		NotificationMaster.restartObservers.Add (this);
+		NotificationMaster.playerObservers.Add (this);
 	}
 
 	public void SpawnEnemy() {
@@ -26,6 +27,14 @@ public class EnemyManager : MonoBehaviour, IRestartObserver {
 	}
 
 	public void Restart() {
+		DestroyAllChildren ();
+	}
+
+	public void PlayerDied() {
+		DestroyAllChildren ();
+	}
+
+	private void DestroyAllChildren() {
 		while (transform.childCount > 0) {
 			Transform child = transform.GetChild (0);
 			child.parent = null;
