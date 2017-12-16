@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using Prime31;
 
-public class PlayerController : MonoBehaviour, IRestartObserver {
+public class PlayerControllerPC : MonoBehaviour, IRestartObserver {
 
 	// Tells us what our collison state was in the last frame
 	public CharacterController2D.CharacterCollisionState2D flags;
@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	public Vector3 _velocity;
 
 	public GameObject projectile;
-	private Vector2 playerSize;
+	private float playerWidth;
 	private float projectileSpeed = 8.0f;
 
 	private static int index = 0;
@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		_controller.onTriggerEnterEvent += onTriggerEnterEvent;
 
 		PlayerTransform = transform;
-		playerSize = GetComponent <SpriteRenderer> ().bounds.size;
+		playerWidth = GetComponent <SpriteRenderer> ().bounds.extents.x * 2.0f;
 	}
 
 	public void OnEnable() {
@@ -76,34 +76,19 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		activated = false;
 	}
 
-	private float shootCooldown = 1.0f;
-	private float shootCooldownTimer = 0.0f;
 
 	// the Update loop contains a very simple example of moving the character around and controlling the animation
 	void Update()
 	{
-		float x = Input.GetAxis("Horizontal");
-		bool fire = Input.GetButtonDown ("Fire");
-		//bool jump = Input.GetButtonDown ("Jump");
-		//bool jumpCancel = Input.GetButtonUp ("Jump");
-
-		bool jump = Input.GetKeyDown ("joystick button 0");
-		bool jumpCancel = Input.GetKeyUp ("joystick button 0");
-
-		float fireX = Input.GetAxis ("FireX");
-		float fireY = Input.GetAxis ("FireY");
-		if (Mathf.Abs(fireX) > .5f||Mathf.Abs(fireY) > .5f)
-			fire = true;
-
-		if(x > .3)
+		if( Input.GetKey( KeyCode.RightArrow ) )
 		{
-			normalizedHorizontalSpeed = x;
+			normalizedHorizontalSpeed = 1;
 			if (spriteFlipped)
 				FlipPlayer ();
 		}
-		else if(x < -.3)
+		else if( Input.GetKey( KeyCode.LeftArrow ) )
 		{
-			normalizedHorizontalSpeed = x;
+			normalizedHorizontalSpeed = -1;
 			if (!spriteFlipped)
 				FlipPlayer ();
 		}
@@ -113,18 +98,18 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		}
 
 		if (_controller.isGrounded) {
-
+			
 			_velocity.y = 0;
 
 			// we can only jump whilst grounded
-			if (jump) {
+			if (Input.GetKeyDown (KeyCode.UpArrow)) {
 				_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
 				_animator.Play( "Jump" );
 				AudioManager.PlayPlayerJump ();
 			}
 		}
 		else {
-			if (jumpCancel && (_velocity.y > 0)) {
+			if (Input.GetKeyUp (KeyCode.UpArrow) && (_velocity.y > 0)) {
 				_velocity.y *= .5f;
 			}
 		}
@@ -138,7 +123,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 
 		// if holding down bump up our movement amount and turn off one way platform detection for a frame.
 		// this lets us jump down through one way platforms
-		if( _controller.isGrounded && Input.GetKey(KeyCode.DownArrow) )
+		if( _controller.isGrounded && Input.GetKey( KeyCode.DownArrow ) )
 		{
 			_velocity.y *= 3f;
 			_controller.ignoreOneWayPlatformsThisFrame = true;
@@ -149,21 +134,18 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
 
-		if (shootCooldownTimer > 0) {
-			shootCooldownTimer -= Time.deltaTime;
-		}
-		else if (fire) {
+		bool fire = Input.GetKeyDown (KeyCode.Space);
+
+		if (fire) {
 			AudioManager.PlayEnemyShoot ();
 			_animator.Play("Shoot");
 
-			//float direction = spriteFlipped ? -1 : 1;
-			Vector2 direction = -new Vector2(fireX, fireY);
+			float direction = spriteFlipped ? -1 : 1;
 			GameObject missile = Instantiate (projectile);
-			missile.transform.position = transform.position + Vector3.Scale(playerSize, direction.normalized);
-			missile.GetComponent <Missile>().Initialize(direction.normalized, projectileSpeed);
+			missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
+			missile.GetComponent <Missile>().Initialize(Vector3.right * direction, projectileSpeed);
 
 			shoot = true;
-			shootCooldownTimer = shootCooldown;
 		}
 	}
 
@@ -176,13 +158,13 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		ghostActions [index++] = shoot ? 1 : -1;
 		shoot = false;
 
-		if (index >= ghostActions.Length - 5) {
+		if (index >= ghostActions.Length - 4) {
 			float[] temp = new float[ghostActions.Length * 2];
 			ghostActions.CopyTo(temp, 0);
 			ghostActions = temp;
 		}
 	}
-
+		
 	public void FlipPlayer() {
 		AudioManager.PlayPlayerTurn ();
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
