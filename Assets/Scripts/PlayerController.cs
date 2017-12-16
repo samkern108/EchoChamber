@@ -76,24 +76,30 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		activated = false;
 	}
 
-	private float shootCooldown = 1.0f;
-	private float shootCooldownTimer = 0.0f;
+	private bool shooting = true;
 
 	// the Update loop contains a very simple example of moving the character around and controlling the animation
 	void Update()
 	{
 		float x = Input.GetAxis("Horizontal");
-		bool fire = Input.GetButtonDown ("Fire");
+		float y = Input.GetAxis ("Vertical");
+		//bool fire = Input.GetButtonDown ("Fire");
 		//bool jump = Input.GetButtonDown ("Jump");
 		//bool jumpCancel = Input.GetButtonUp ("Jump");
 
-		bool jump = Input.GetKeyDown ("joystick button 0");
-		bool jumpCancel = Input.GetKeyUp ("joystick button 0");
+		bool fire = Input.GetAxisRaw ("Fire") <= 0.0f;
+		if (!fire)
+			shooting = false;
 
-		float fireX = Input.GetAxis ("FireX");
+		Debug.Log (Input.GetAxisRaw("Fire"));
+		
+		bool jump = Input.GetKeyDown (KeyCode.JoystickButton18);
+		bool jumpCancel = Input.GetKeyUp (KeyCode.JoystickButton18);
+
+		/*float fireX = Input.GetAxis ("FireX");
 		float fireY = Input.GetAxis ("FireY");
 		if (Mathf.Abs(fireX) > .5f||Mathf.Abs(fireY) > .5f)
-			fire = true;
+			fire = true;*/
 
 		if(x > .3)
 		{
@@ -149,21 +155,24 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
 
-		if (shootCooldownTimer > 0) {
+		/*if (shootCooldownTimer > 0) {
 			shootCooldownTimer -= Time.deltaTime;
 		}
-		else if (fire) {
+		else */if (fire && !shooting) {
+			shooting = true;
 			AudioManager.PlayEnemyShoot ();
 			_animator.Play("Shoot");
 
 			//float direction = spriteFlipped ? -1 : 1;
-			Vector2 direction = -new Vector2(fireX, fireY);
+			Vector2 direction = new Vector2(x, y).normalized;
+			if (direction == Vector2.zero)
+				direction = spriteFlipped ? Vector2.left : Vector2.right;
 			GameObject missile = Instantiate (projectile);
 			missile.transform.position = transform.position + Vector3.Scale(playerSize, direction.normalized);
 			missile.GetComponent <Missile>().Initialize(direction.normalized, projectileSpeed);
 
 			shoot = true;
-			shootCooldownTimer = shootCooldown;
+			//shootCooldownTimer = shootCooldown;
 		}
 	}
 
