@@ -43,18 +43,14 @@ public class Ghost : MonoBehaviour {
 		}
 	}
 
-	public void Update() {
-		if (positionIndex < positions.Length - 2) {
+	public void FixedUpdate() {
+		if (positionIndex < positions.Length - 3) {
 			float oldx = transform.position.x;
 			transform.position = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
 
-			if (Mathf.Abs(transform.position.x - oldx) >= .5f) {
-				float sign = Mathf.Sign (transform.position.x - oldx);
-
-				if ((sign == -1f && !spriteFlipped) || (sign == 1f && spriteFlipped)) {
-					spriteFlipped = !spriteFlipped;
-					GetComponent<SpriteRenderer> ().flipX = spriteFlipped;
-				}
+			if (positions[positionIndex++] != (spriteFlipped ? 1 : -1)) {
+				spriteFlipped = !spriteFlipped;
+				GetComponent<SpriteRenderer> ().flipX = spriteFlipped;
 			}
 		} else if(active) {
 			StopRoutine ();

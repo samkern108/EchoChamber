@@ -126,17 +126,20 @@ public class PlayerController : MonoBehaviour {
 
 		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
+	}
 
+	public void FixedUpdate() {
 		ghostPositions [index++] = transform.position.x;
 		ghostPositions [index++] = transform.position.y;
+		ghostPositions [index++] = spriteFlipped ? 1 : -1;
 
-		if (index == ghostPositions.Length) {
+		if (index >= ghostPositions.Length - 3) {
 			float[] temp = new float[ghostPositions.Length * 2];
 			ghostPositions.CopyTo(temp, 0);
 			ghostPositions = temp;
 		}
 	}
-
+		
 	public void FlipPlayer() {
 		AudioManager.PlayPlayerTurn ();
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
