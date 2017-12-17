@@ -22,30 +22,14 @@ public class Enemy : MonoBehaviour {
 	void Start () {
 		size = GetComponent <SpriteRenderer>().bounds.extents;
 
-		Vector3 newPosition = Room.GetRandomPointInRoom ();
-		RaycastHit2D hit = Physics2D.Raycast (newPosition, Vector2.down, 10.0f, 1 << LayerMask.NameToLayer("Wall"));
-		if (!hit.collider) {
-			newPosition.y += size.y;
-			hit = Physics2D.Raycast (newPosition, Vector2.down, 10.0f, 1 << LayerMask.NameToLayer ("Wall"));
-			Debug.DrawRay (newPosition, Vector2.down, Color.green, 5.0f);
-			Debug.Log ("hit top");
-		} else {
-			Debug.Log ("hit center with normal " + hit.point.y);
-		}
-
-		if (!hit.collider) {
-			newPosition.y -= size.y * 2;
-			hit = Physics2D.Raycast (newPosition, Vector2.down, 10.0f, 1 << LayerMask.NameToLayer ("Wall"));
-			Debug.DrawRay (newPosition, Vector2.down,Color.blue,5.0f);
-			Debug.Log ("hit bottom");
-		}
-			
-		newPosition.y = hit.point.y + size.y;
-
-		floor = hit.collider.bounds;
-
+		Vector3 newPosition = Room.GetRandomPointOnFloorAvoidingPoints (new Vector2[]{PlayerController.PlayerPosition});
+	
+		newPosition.y += size.y;
 		transform.position = newPosition;
 		startPosition = newPosition;
+
+		RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 20.0f, 1 << LayerMask.NameToLayer("Wall"));
+		floor = hit.collider.bounds;
 
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
 
@@ -93,8 +77,8 @@ public class Enemy : MonoBehaviour {
 	private IEnumerator Co_Shoot()
 	{
 		while (detectedPlayer) {
-			Shoot ();
 			yield return new WaitForSeconds (shootCooldown);
+			Shoot ();
 		}
 	}
 

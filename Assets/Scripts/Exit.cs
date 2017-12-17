@@ -22,7 +22,7 @@ public class Exit : MonoBehaviour, IRestartObserver {
 	}
 
 	void RepositionExit() {
-		transform.position = Room.GetRandomPointInRoom();
+		transform.position = Room.GetRandomPointInRoomAvoidingPoints(new Vector2[]{transform.position, PlayerController.PlayerPosition});
 		activated = false;
 	}
 

@@ -8,8 +8,6 @@ public class Ghost : MonoBehaviour {
 	private float playerWidth;
 
 	private bool active = false;
-	private Vector3 startPosition;
-	private Vector2 moveInput;
 
 	private float[] positions;
 	private int positionIndex = 0;
@@ -23,7 +21,7 @@ public class Ghost : MonoBehaviour {
 	public void Initialize (float[] positions) {
 		this.positions = positions;
 
-		playerWidth = GetComponent <SpriteRenderer> ().bounds.extents.x * 2.0f;
+		playerWidth = GetComponent <SpriteRenderer> ().bounds.size.x;
 
 		animator = GetComponent <Animator>();
 	}
@@ -37,7 +35,6 @@ public class Ghost : MonoBehaviour {
 
 	public void FixedUpdate() {
 		if (positionIndex < positions.Length - 3) {
-			float oldx = transform.position.x;
 			transform.position = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
 
 			if (positions[positionIndex++] != spriteFlipped) {
