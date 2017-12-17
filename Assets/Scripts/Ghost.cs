@@ -16,14 +16,13 @@ public class Ghost : MonoBehaviour {
 
 	private float shootTelemarkTime = .5f;
 
-	private bool spriteFlipped = false;
+	private int spriteFlipped = 1;
 
 	private Animator animator;
 
 	public void Initialize (float[] positions) {
 		this.positions = positions;
 
-		spriteFlipped = false;
 		playerWidth = GetComponent <SpriteRenderer> ().bounds.extents.x * 2.0f;
 
 		animator = GetComponent <Animator>();
@@ -34,10 +33,6 @@ public class Ghost : MonoBehaviour {
 
 		active = true;
 		positionIndex = 0;
-		/*shootIndex = 0;
-		if (shootIndex < shootTimes.Length) {
-			Invoke ("Shoot", shootTimes [shootIndex]);// - shootTelemarkTime);
-		}*/
 	}
 
 	public void FixedUpdate() {
@@ -45,9 +40,9 @@ public class Ghost : MonoBehaviour {
 			float oldx = transform.position.x;
 			transform.position = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
 
-			if (positions[positionIndex++] != (spriteFlipped ? 1 : -1)) {
-				spriteFlipped = !spriteFlipped;
-				GetComponent<SpriteRenderer> ().flipX = spriteFlipped;
+			if (positions[positionIndex++] != spriteFlipped) {
+				spriteFlipped *= -1;
+				GetComponent<SpriteRenderer> ().flipX = (spriteFlipped == -1);
 			}
 			if (positions [positionIndex++] == 1) {
 				Shoot ();
@@ -67,7 +62,7 @@ public class Ghost : MonoBehaviour {
 	private void Shoot() {
 		AudioManager.PlayEnemyShoot ();
 		animator.speed = 1.0f;
-		float direction = spriteFlipped ? -1 : 1;
+		float direction = spriteFlipped;
 		GameObject missile = Instantiate (projectile);
 		missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
 		missile.GetComponent <Missile>().Initialize(Vector3.right * direction, 8.0f);

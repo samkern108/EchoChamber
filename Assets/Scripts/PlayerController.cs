@@ -21,8 +21,8 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 
 	private float normalizedHorizontalSpeed = 0;
 
-	// A non-flipped PlayerTemp sprite faces right
-	public static bool spriteFlipped = false;
+	// A non-flipped PlayerTemp sprite faces right (1)
+	public static int spriteFlipped = 1;
 
 	private CharacterController2D _controller;
 	private Animator _animator;
@@ -34,8 +34,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	private float projectileSpeed = 8.0f;
 
 	private static int index = 0;
-	public static float[] ghostActions = new float[500];
-
+	private static float[] ghostActions = new float[500];
 
 	void Awake()
 	{
@@ -69,12 +68,12 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		}
 	}
 
-	#endregion
-
 	// Just so the player can't touch exits twice
 	public void Deactivate() {
 		activated = false;
 	}
+
+	#endregion
 
 	private bool shooting = true;
 
@@ -83,34 +82,41 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	{
 		float x = Input.GetAxis("Horizontal");
 		float y = Input.GetAxis ("Vertical");
-		//bool fire = Input.GetButtonDown ("Fire");
-		//bool jump = Input.GetButtonDown ("Jump");
-		//bool jumpCancel = Input.GetButtonUp ("Jump");
 
 		bool fire = Input.GetAxisRaw ("Fire") <= 0.0f;
 		if (!fire)
 			shooting = false;
+		else if (fire && !shooting) {
+			shooting = true;
+			AudioManager.PlayEnemyShoot ();
+			_animator.Play("Shoot");
 
-		Debug.Log (Input.GetAxisRaw("Fire"));
-		
-		bool jump = Input.GetKeyDown (KeyCode.JoystickButton18);
-		bool jumpCancel = Input.GetKeyUp (KeyCode.JoystickButton18);
+			//float direction = spriteFlipped ? -1 : 1;
+			Vector2 direction = new Vector2(x, y).normalized;
+			if (direction == Vector2.zero)
+				direction.x = spriteFlipped;
+			GameObject missile = Instantiate (projectile);
+			missile.transform.position = transform.position + Vector3.Scale(playerSize, direction.normalized);
+			missile.GetComponent <Missile>().Initialize(direction.normalized, projectileSpeed);
 
+			// for the ghost
+			shoot = true;
+		}
+
+
+		bool jump = Input.GetKeyDown (KeyCode.JoystickButton18) || Input.GetKeyDown (KeyCode.UpArrow);
+		bool jumpCancel = Input.GetKeyUp (KeyCode.JoystickButton18) || Input.GetKeyUp (KeyCode.UpArrow);
+
+		// xbox
 		/*float fireX = Input.GetAxis ("FireX");
 		float fireY = Input.GetAxis ("FireY");
 		if (Mathf.Abs(fireX) > .5f||Mathf.Abs(fireY) > .5f)
 			fire = true;*/
 
-		if(x > .3)
+		if(Mathf.Abs(x) > .3)
 		{
 			normalizedHorizontalSpeed = x;
-			if (spriteFlipped)
-				FlipPlayer ();
-		}
-		else if(x < -.3)
-		{
-			normalizedHorizontalSpeed = x;
-			if (!spriteFlipped)
+			if (spriteFlipped * x < 0)
 				FlipPlayer ();
 		}
 		else
@@ -154,26 +160,6 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 
 		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
-
-		/*if (shootCooldownTimer > 0) {
-			shootCooldownTimer -= Time.deltaTime;
-		}
-		else */if (fire && !shooting) {
-			shooting = true;
-			AudioManager.PlayEnemyShoot ();
-			_animator.Play("Shoot");
-
-			//float direction = spriteFlipped ? -1 : 1;
-			Vector2 direction = new Vector2(x, y).normalized;
-			if (direction == Vector2.zero)
-				direction = spriteFlipped ? Vector2.left : Vector2.right;
-			GameObject missile = Instantiate (projectile);
-			missile.transform.position = transform.position + Vector3.Scale(playerSize, direction.normalized);
-			missile.GetComponent <Missile>().Initialize(direction.normalized, projectileSpeed);
-
-			shoot = true;
-			//shootCooldownTimer = shootCooldown;
-		}
 	}
 
 	private bool shoot = false;
@@ -181,7 +167,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	public void FixedUpdate() {
 		ghostActions [index++] = transform.position.x;
 		ghostActions [index++] = transform.position.y;
-		ghostActions [index++] = spriteFlipped ? 1 : -1;
+		ghostActions [index++] = spriteFlipped;
 		ghostActions [index++] = shoot ? 1 : -1;
 		shoot = false;
 
@@ -197,7 +183,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
 
 		// Fixes the sprite not flipping due to animator issues. If we can flip the sprite in the animator, that will be a lot easier.
-		spriteFlipped = !spriteFlipped;
+		spriteFlipped *= -1;
 		//GetComponent <SpriteRenderer>().flipX = spriteFlipped;
 	}
 

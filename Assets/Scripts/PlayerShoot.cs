@@ -25,7 +25,7 @@ public class PlayerShoot : MonoBehaviour {
 			AudioManager.PlayEnemyShoot ();
 			animator.Play("Shoot");
 
-			float direction = PlayerController.spriteFlipped ? -1 : 1;
+			float direction = PlayerController.spriteFlipped;
 			GameObject missile = Instantiate (projectile);
 			missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
 			missile.GetComponent <Missile>().Initialize(Vector3.right * direction, projectileSpeed);
