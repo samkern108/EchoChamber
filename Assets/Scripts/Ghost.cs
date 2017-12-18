@@ -17,18 +17,31 @@ public class Ghost : MonoBehaviour {
 	private int spriteFlipped = 1;
 
 	private Animator animator;
+	private SpriteRenderer spriteRenderer;
 
 	public void Initialize (float[] positions) {
 		this.positions = positions;
 
-		playerWidth = GetComponent <SpriteRenderer> ().bounds.size.x;
-
+		spriteRenderer = GetComponent <SpriteRenderer> ();
 		animator = GetComponent <Animator>();
+
+		playerWidth = spriteRenderer.bounds.size.x;
+
+		Color color = Palette.GhostColor;
+		color.a = .9f;
+		spriteRenderer.color = color;
 	}
 
 	public void EnactRoutine () {
-		animator.Play ("Appear");
+		Color color = spriteRenderer.color;
+		color.a -= .05f;
+		spriteRenderer.color = color;
 
+		if (color.a <= 0) {
+			Destroy (this.gameObject);
+		}
+
+		animator.Play ("Appear");
 		active = true;
 		positionIndex = 0;
 	}
