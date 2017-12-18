@@ -37,15 +37,13 @@ public class Ghost : MonoBehaviour {
 	}
 
 	public void EnactRoutine () {
-		currentColor = spriteRenderer.color;
 		currentColor.a -= .05f;
-		spriteRenderer.color = currentColor;
 
 		if (currentColor.a <= 0) {
 			Destroy (this.gameObject);
 		}
 
-		animator.Play ("Appear");
+		animate.AnimateToColor (Palette.invisible,currentColor,.3f);
 		active = true;
 		positionIndex = 0;
 	}
@@ -87,6 +85,6 @@ public class Ghost : MonoBehaviour {
 
 	public void StopRoutine() {
 		active = false;
-		animator.Play ("Disappear");
+		animate.AnimateToColor (currentColor,Palette.invisible,.3f);
 	}
 }
