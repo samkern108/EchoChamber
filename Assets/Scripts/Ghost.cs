@@ -17,27 +17,31 @@ public class Ghost : MonoBehaviour {
 	private int spriteFlipped = 1;
 
 	private Animator animator;
+	private Animate animate;
 	private SpriteRenderer spriteRenderer;
+
+	private Color currentColor;
 
 	public void Initialize (float[] positions) {
 		this.positions = positions;
 
 		spriteRenderer = GetComponent <SpriteRenderer> ();
 		animator = GetComponent <Animator>();
+		animate = GetComponent <Animate>();
 
 		playerWidth = spriteRenderer.bounds.size.x;
 
-		Color color = Palette.GhostColor;
-		color.a = .9f;
-		spriteRenderer.color = color;
+		currentColor = Palette.GhostColor;
+		currentColor.a = .9f;
+		spriteRenderer.color = currentColor;
 	}
 
 	public void EnactRoutine () {
-		Color color = spriteRenderer.color;
-		color.a -= .05f;
-		spriteRenderer.color = color;
+		currentColor = spriteRenderer.color;
+		currentColor.a -= .05f;
+		spriteRenderer.color = currentColor;
 
-		if (color.a <= 0) {
+		if (currentColor.a <= 0) {
 			Destroy (this.gameObject);
 		}
 
@@ -47,6 +51,11 @@ public class Ghost : MonoBehaviour {
 	}
 
 	public void FixedUpdate() {
+		if(((positionIndex + (4 * 30) - 1) < positions.Length) && (positions[positionIndex + (4 * 30) - 1] == 1)) {
+			TelemarkShoot ();
+		}
+
+		// (x | y | flip | shoot)
 		if (positionIndex < positions.Length - 3) {
 			transform.position = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
 
@@ -63,15 +72,13 @@ public class Ghost : MonoBehaviour {
 	}
 
 	private void TelemarkShoot() {
-		animator.speed = .8f;
-		animator.Play ("Shoot");
-		//Invoke ("Shoot", shootTelemarkTime);
+		animate.AnimateToColor (currentColor,Color.red,.3f);
 	}
 
 	// Lot of duplicate shoot code
 	private void Shoot() {
+		animate.AnimateToColor (Color.red,currentColor,.3f);
 		AudioManager.PlayEnemyShoot ();
-		animator.speed = 1.0f;
 		float direction = spriteFlipped;
 		GameObject missile = Instantiate (projectile);
 		missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
