@@ -14,7 +14,6 @@ public class Ghost : MonoBehaviour {
 
 	private int spriteFlipped = 1;
 
-	private Animator animator;
 	private Animate animate;
 	private SpriteRenderer spriteRenderer;
 
@@ -27,7 +26,6 @@ public class Ghost : MonoBehaviour {
 
 	public void Awake() {
 		spriteRenderer = GetComponent <SpriteRenderer> ();
-		animator = GetComponent <Animator>();
 		animate = GetComponent <Animate>();
 
 		playerWidth = spriteRenderer.bounds.size.x;

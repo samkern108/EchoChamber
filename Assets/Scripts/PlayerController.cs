@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	public static int spriteFlipped = 1;
 
 	private CharacterController2D _controller;
-	private Animator _animator;
+	private Animate _animate;
 	private RaycastHit2D _lastControllerColliderHit;
 	public Vector3 _velocity;
 
@@ -38,10 +38,12 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 
 	void Awake()
 	{
+		GetComponent <SpriteRenderer>().color = Palette.invisible;
+
 		NotificationMaster.restartObservers.Add (this);
 		NotificationMaster.checkpointObservers.Add (this);
 
-		_animator = GetComponent<Animator>();
+		_animate = GetComponent<Animate>();
 		_controller = GetComponent<CharacterController2D>();
 
 		PlayerTransform = transform;
@@ -65,9 +67,10 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		if (!fire)
 			shooting = false;
 		else if (fire && !shooting) {
+			_animate.AnimateToColorAndBack (Palette.PlayerColor, Color.red, .05f);
+
 			shooting = true;
 			AudioManager.PlayEnemyShoot ();
-			_animator.Play("Shoot");
 
 			//float direction = spriteFlipped ? -1 : 1;
 			Vector2 direction = new Vector2(x, y).normalized;
@@ -109,7 +112,6 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			// we can only jump whilst grounded
 			if (jump) {
 				_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
-				_animator.Play( "Jump" );
 				AudioManager.PlayPlayerJump ();
 			}
 		}
@@ -182,11 +184,9 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped);
 	}
 
-	public void OnEnable() {
-		_animator.Play("Appear");
-	}
-
 	private void SpawnPlayer() {
+		GetComponent <SpriteRenderer>().color = Palette.invisible;
+
 		Vector3 newPosition = Vector3.zero;
 		RaycastHit2D hit = Physics2D.Linecast (transform.position + new Vector3(0, playerExtents.y, 0), newPosition - new Vector3(0, playerExtents.y, 0), 1 << LayerMask.NameToLayer("Wall"));
 		if (hit.collider) {
@@ -196,6 +196,8 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 
 		ghostActions = new float[500];
 		index = 0;
+
+		_animate.AnimateToColor (Palette.invisible, Palette.PlayerColor, .5f);
 	}
 
 	public void Restart() {
