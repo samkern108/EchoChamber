@@ -3,36 +3,24 @@ using System.Collections;
 
 public class Health : MonoBehaviour {
 
-	private LayerMask layerMask;
-
-	public void Start() {
-		layerMask = 1 << LayerMask.NameToLayer ("Enemy") | LayerMask.NameToLayer("Projectile") | LayerMask.NameToLayer("EnemyProjectile");
-	}
-
-	public void OnCollisionEnter2D(Collision2D coll) {
-		Debug.Log ("Collision " + LayerMask.LayerToName(coll.gameObject.layer));
-		if (coll.gameObject.tag == "Enemy" || coll.gameObject.tag == "Projectile" || coll.gameObject.tag == "EnemyProjectile") {
-			Debug.Log ("Collided with " + coll.gameObject.name); 
+	// Totally not working. CharacterController2D is the suspect.
+	/*public void OnCollisionEnter2D(Collision2D coll) {
+		if (coll.gameObject.tag == "Enemy" || coll.gameObject.tag == "Projectile" || coll.gameObject.tag == "EnemyProjectile" || coll.gameObject.tag == "Ghost") {
 			Die ();
 		}
-	}
+	}*/
 
+	// Player collides fatally with Enemy, EnemyProjectile, and Ghost.
+	// Player collides notfatally with Exit.
 	public void OnTriggerEnter2D(Collider2D coll) {
-		Debug.Log ("Trigger Collision " + LayerMask.LayerToName(coll.gameObject.layer));
-		if (coll.tag == "Enemy" || coll.tag == "Projectile" || coll.tag == "EnemyProjectile") {
-			Debug.Log ("Trigger collided with " + coll.gameObject.name);
+		if (coll.gameObject.layer != LayerMask.NameToLayer ("Exit")) {
 			Die ();
 		}
 	}
 
 	private void Die() {
-		if (gameObject.tag == "Player") {
-			NotificationMaster.SendPlayerDeathNotification ();
-			AudioManager.PlayPlayerDeath ();
-			gameObject.SetActive (false);
-		} else {
-			AudioManager.PlayEnemyDeath ();
-			GameObject.Destroy (this.gameObject);
-		}
+		NotificationMaster.SendPlayerDeathNotification ();
+		AudioManager.PlayPlayerDeath ();
+		gameObject.SetActive (false);
 	}
 }

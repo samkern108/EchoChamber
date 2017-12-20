@@ -50,24 +50,40 @@ public class Ghost : MonoBehaviour {
 		positionIndex = 0;
 	}
 
+	// Hack
+	private bool lerping = true;
+	private Vector3 nextPosition;
+	private float playbackRate = .8f;
+
 	public void FixedUpdate() {
+		if (active && positionIndex >= positions.Length - 3) {
+			active = !active;
+			animate.AnimateToColor (currentColor,Palette.invisible,.3f);
+		}
+		if (!active) {
+			return;
+		}
+
+		lerping = !lerping;
+		if (lerping) {
+			transform.position = Vector3.Lerp (transform.position, new Vector3 (positions [positionIndex], positions [positionIndex + 1], 0), .5f);
+			return;
+		}
+
 		if(((positionIndex + (4 * 30) - 1) < positions.Length) && (positions[positionIndex + (4 * 30) - 1] == 1)) {
 			TelemarkShoot ();
 		}
 
 		// (x | y | flip | shoot)
-		if (positionIndex < positions.Length - 3) {
-			transform.position = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
+		nextPosition = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
+		transform.position = nextPosition;
 
-			if (positions[positionIndex++] != spriteFlipped) {
-				spriteFlipped *= -1;
-				GetComponent<SpriteRenderer> ().flipX = (spriteFlipped == -1);
-			}
-			if (positions [positionIndex++] == 1) {
-				Shoot ();
-			}
-		} else if(active) {
-			StopRoutine ();
+		if (positions[positionIndex++] != spriteFlipped) {
+			spriteFlipped *= -1;
+			GetComponent<SpriteRenderer> ().flipX = (spriteFlipped == -1);
+		}
+		if (positions [positionIndex++] == 1) {
+			Shoot ();
 		}
 	}
 
@@ -83,10 +99,5 @@ public class Ghost : MonoBehaviour {
 		GameObject missile = Instantiate (projectile);
 		missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
 		missile.GetComponent <Missile>().Initialize(Vector3.right * direction, 8.0f);
-	}
-
-	public void StopRoutine() {
-		active = false;
-		animate.AnimateToColor (currentColor,Palette.invisible,.3f);
 	}
 }

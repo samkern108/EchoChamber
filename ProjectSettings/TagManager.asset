@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - Projectile
   - Wall
+  - Ghost
   layers:
   - Default
   - TransparentFX
@@ -23,7 +24,7 @@ TagManager:
   - Projectile
   - Exit
   - Enemy
-  - Invuln
+  - Ghost
   - EnemyProjectile
   - 
   - 
