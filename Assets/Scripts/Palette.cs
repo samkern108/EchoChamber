@@ -17,7 +17,8 @@ public static class Palette {
 
 	public static Color PlayerColor = new Color(91/255.0f,198/255.0f,251/255.0f);
 	public static Color GhostColor = new Color(145/255.0f,187/255.0f,207/255.0f);
-	public static Color invisible = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+	public static Color EnemyColor = new Color(212/255.0f,115/255.0f,115/255.0f);
+	public static Color Invisible = new Color(1.0f, 1.0f, 1.0f, 0.0f);
 
 	public static Color GetRandomGhostColor() {
 		return ColorFromInt(colors[Random.Range(0, colors.Length - 1)]);

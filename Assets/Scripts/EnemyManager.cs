@@ -17,19 +17,17 @@ public class EnemyManager : MonoBehaviour, IRestartObserver, IPlayerObserver, IC
 
 	public void CheckpointActivated() {
 		// Disabling until we figure out what the gameplay is :3
-		// SpawnEnemy();
+		SpawnEnemy();
 	}
 
 	private void SpawnEnemy() {
-		GameObject enemy = GameObject.Instantiate (p_enemy);
-		enemy.transform.SetParent (this.transform);
+		GameObject enemy = GameObject.Instantiate (p_enemy, this.transform);
 	}
 
 	private static int _numEnemies;
 	public int NumEnemies
 	{
-		get { Debug.Log (transform.childCount); 
-			return transform.childCount; }
+		get { return transform.childCount; }
 	}
 
 	public void Restart() {

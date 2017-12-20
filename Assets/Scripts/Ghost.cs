@@ -50,7 +50,7 @@ public class Ghost : MonoBehaviour {
 		active = true;
 		positionIndex = 0;
 		transform.position = new Vector3 (positions [positionIndex], positions [positionIndex + 1], 0);
-		animate.AnimateToColor (Palette.invisible,currentColor,.3f);
+		animate.AnimateToColor (Palette.Invisible,currentColor,.3f);
 	}
 
 	private void SetInactive() {
@@ -60,7 +60,7 @@ public class Ghost : MonoBehaviour {
 	public void FixedUpdate() {
 		if (active && positionIndex >= positions.Length - 3) {
 			active = !active;
-			animate.AnimateToColor (currentColor, Palette.invisible, .3f);
+			animate.AnimateToColor (currentColor, Palette.Invisible, .3f);
 			Invoke ("SetInactive", .3f);
 		}
 		if (!active) {
@@ -88,8 +88,6 @@ public class Ghost : MonoBehaviour {
 			if (positions [positionIndex++] == 1) {
 				Shoot ();
 			}
-		} else {
-			oldPosition = transform.position;
 		}
 
 		transform.position = Vector3.Lerp (oldPosition, nextPosition, lerpFraction);

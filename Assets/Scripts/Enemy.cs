@@ -6,47 +6,54 @@ public class Enemy : MonoBehaviour {
 
 	public GameObject projectile;
 
-	private Vector3 size;
 	private LayerMask layerMask;
+	private Bounds floor;
 
 	private bool detectedPlayer = false;
-
 	private float detectionRadius = 4.0f;
-
-	private Bounds floor;
 
 	private Vector3 startPosition, persistentTargetPosition;
 
-	private Animator animator;
+	private Animate animate;
+	private Vector3 size;
+
+	void Awake() {
+		GetComponent <SpriteRenderer> ().color = Palette.Invisible;
+	}
 
 	void Start () {
 		size = GetComponent <SpriteRenderer>().bounds.extents;
 
-		Vector3 newPosition = Room.GetRandomPointOnFloorAvoidingPoints (new Vector2[]{PlayerController.PlayerPosition});
-	
-		newPosition.y += size.y;
-		transform.position = newPosition;
-		startPosition = newPosition;
+		startPosition = Room.GetRandomPointOnFloorAvoidingPoints (new Vector2[]{PlayerController.PlayerPosition}, size);
+		transform.position = startPosition;
 
 		RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 20.0f, 1 << LayerMask.NameToLayer("Wall"));
 		floor = hit.collider.bounds;
 
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
 
-		animator = GetComponent <Animator>();
+		animate = GetComponent <Animate>();
+		animate.AnimateToColor (Palette.Invisible, Color.yellow, .3f);
 	}
 
 	void Update () {
 		RaycastHit2D hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
-		if (hit.collider.tag == "Wall") {
-			MoveToStart ();
-			detectedPlayer = false;
+		if (hit.collider.tag == "Wall" || (hit.collider.tag == "Player" && hit.distance > detectionRadius)) {
+			//MoveToStart ();
+			if (detectedPlayer) {
+				detectedPlayer = false;
+				animate.AnimateToColor (Palette.EnemyColor, Color.yellow, .3f);
+			}
 			return;
-		} else if (hit.distance < detectionRadius) {
-			MoveToPlayer ();
+		} else {
+			//MoveToPlayer ();
 			if (!detectedPlayer) {
 				detectedPlayer = true;
-				StartCoroutine ("Co_Shoot");
+				animate.AnimateToColor (Color.yellow, Palette.EnemyColor, detectionRampUp);
+
+				if (!shooting) {
+					StartCoroutine ("Co_Shoot");
+				}
 			}
 		}
 	}
@@ -72,19 +79,24 @@ public class Enemy : MonoBehaviour {
 		transform.position = newPosition;
 	}
 
+	private bool shooting = false;
+	private float detectionRampUp = .3f;
 	private float shootCooldown = 1.0f;
 	private float projectileSpeed = 7.0f;
 	private IEnumerator Co_Shoot()
 	{
+		shooting = true;
+		yield return new WaitForSeconds (detectionRampUp);
 		while (detectedPlayer) {
-			yield return new WaitForSeconds (shootCooldown);
 			Shoot ();
+			yield return new WaitForSeconds (shootCooldown);
 		}
+		shooting = false;
 	}
 
 	private void Shoot() {
 		AudioManager.PlayEnemyShoot ();
-		animator.Play ("Shoot");
+		animate.AnimateToColorAndBack (Palette.EnemyColor, Color.red, .2f);
 		Vector3 direction = (PlayerController.PlayerPosition - transform.position).normalized;
 		GameObject missile = Instantiate (projectile, ProjectileManager.myTransform);
 		missile.transform.position = transform.position;

@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	private RaycastHit2D _lastControllerColliderHit;
 	public Vector3 _velocity;
 
+	private bool shooting = true;
 	public GameObject projectile;
 	private Vector2 playerSize, playerExtents;
 	private float projectileSpeed = 8.0f;
@@ -38,7 +39,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 
 	void Awake()
 	{
-		GetComponent <SpriteRenderer>().color = Palette.invisible;
+		GetComponent <SpriteRenderer>().color = Palette.Invisible;
 
 		NotificationMaster.restartObservers.Add (this);
 		NotificationMaster.checkpointObservers.Add (this);
@@ -54,8 +55,6 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	public void Start() {
 		SpawnPlayer ();
 	}
-
-	private bool shooting = true;
 
 	// the Update loop contains a very simple example of moving the character around and controlling the animation
 	void Update()
@@ -101,12 +100,9 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 				FlipPlayer ();
 		}
 		else
-		{
 			normalizedHorizontalSpeed = 0;
-		}
 
 		if (_controller.isGrounded) {
-
 			_velocity.y = 0;
 
 			// we can only jump whilst grounded
@@ -115,11 +111,9 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 				AudioManager.PlayPlayerJump ();
 			}
 		}
-		else {
-			if (jumpCancel && (_velocity.y > 0)) {
+		else
+			if (jumpCancel && (_velocity.y > 0))
 				_velocity.y *= .5f;
-			}
-		}
 
 		// apply horizontal speed smoothing it. dont really do this with Lerp. Use SmoothDamp or something that provides more control
 		var smoothedMovementFactor = _controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
@@ -161,19 +155,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	public void FlipPlayer() {
 		AudioManager.PlayPlayerTurn ();
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
-
-		// Fixes the sprite not flipping due to animator issues. If we can flip the sprite in the animator, that will be a lot easier.
 		spriteFlipped *= -1;
-		//GetComponent <SpriteRenderer>().flipX = spriteFlipped;
-	}
-
-	private static Transform _playerTransform;
-	public static Transform PlayerTransform
-	{
-		set { if(_playerTransform == null) _playerTransform = value; }
-	}
-	public static Vector3 PlayerPosition {
-		get { return _playerTransform.position; }
 	}
 
 	public void CheckpointActivated() {
@@ -185,7 +167,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	}
 
 	private void SpawnPlayer() {
-		GetComponent <SpriteRenderer>().color = Palette.invisible;
+		GetComponent <SpriteRenderer>().color = Palette.Invisible;
 
 		Vector3 newPosition = Vector3.zero;
 		RaycastHit2D hit = Physics2D.Linecast (transform.position + new Vector3(0, playerExtents.y, 0), newPosition - new Vector3(0, playerExtents.y, 0), 1 << LayerMask.NameToLayer("Wall"));
@@ -197,11 +179,20 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		ghostActions = new float[500];
 		index = 0;
 
-		_animate.AnimateToColor (Palette.invisible, Palette.PlayerColor, .5f);
+		_animate.AnimateToColor (Palette.Invisible, Palette.PlayerColor, .5f);
 	}
 
 	public void Restart() {
 		SpawnPlayer ();
 		gameObject.SetActive (true);
+	}
+
+	private static Transform _playerTransform;
+	public static Transform PlayerTransform
+	{
+		set { if(_playerTransform == null) _playerTransform = value; }
+	}
+	public static Vector3 PlayerPosition {
+		get { return _playerTransform.position; }
 	}
 }
