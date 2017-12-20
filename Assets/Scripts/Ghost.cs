@@ -12,13 +12,16 @@ public class Ghost : MonoBehaviour {
 	private float[] positions;
 	private int positionIndex = 0;
 
-	private float shootTelemarkTime = .5f;
-
 	private int spriteFlipped = 1;
 
 	private Animator animator;
 	private Animate animate;
 	private SpriteRenderer spriteRenderer;
+
+	private float projectileSpeed = 8.0f;
+
+	private Vector3 oldPosition, nextPosition;
+	private float playbackRate = .8f, lerpFraction = .0f;
 
 	private Color currentColor;
 
@@ -50,41 +53,46 @@ public class Ghost : MonoBehaviour {
 		positionIndex = 0;
 	}
 
-	// Hack
-	private bool lerping = true;
-	private Vector3 nextPosition;
-	private float playbackRate = .8f;
+	private void SetInactive() {
+		gameObject.SetActive (false);
+	}
 
 	public void FixedUpdate() {
 		if (active && positionIndex >= positions.Length - 3) {
 			active = !active;
-			animate.AnimateToColor (currentColor,Palette.invisible,.3f);
+			animate.AnimateToColor (currentColor, Palette.invisible, .3f);
+			Invoke ("SetInactive", .3f);
 		}
 		if (!active) {
 			return;
 		}
 
-		lerping = !lerping;
-		if (lerping) {
-			transform.position = Vector3.Lerp (transform.position, new Vector3 (positions [positionIndex], positions [positionIndex + 1], 0), .5f);
-			return;
+		lerpFraction += playbackRate;
+
+		if (lerpFraction >= 1.0f) {
+			lerpFraction -= 1.0f;
+
+			if (((positionIndex + (4 * 30) - 1) < positions.Length) && (positions [positionIndex + (4 * 30) - 1] == 1)) {
+				TelemarkShoot ();
+			}
+
+			oldPosition = nextPosition;
+
+			// (x | y | flip | shoot)
+			nextPosition = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
+
+			if (positions [positionIndex++] != spriteFlipped) {
+				spriteFlipped *= -1;
+				GetComponent<SpriteRenderer> ().flipX = (spriteFlipped == -1);
+			}
+			if (positions [positionIndex++] == 1) {
+				Shoot ();
+			}
+		} else {
+			oldPosition = transform.position;
 		}
 
-		if(((positionIndex + (4 * 30) - 1) < positions.Length) && (positions[positionIndex + (4 * 30) - 1] == 1)) {
-			TelemarkShoot ();
-		}
-
-		// (x | y | flip | shoot)
-		nextPosition = new Vector3 (positions [positionIndex++], positions [positionIndex++], 0);
-		transform.position = nextPosition;
-
-		if (positions[positionIndex++] != spriteFlipped) {
-			spriteFlipped *= -1;
-			GetComponent<SpriteRenderer> ().flipX = (spriteFlipped == -1);
-		}
-		if (positions [positionIndex++] == 1) {
-			Shoot ();
-		}
+		transform.position = Vector3.Lerp (oldPosition, nextPosition, lerpFraction);
 	}
 
 	private void TelemarkShoot() {
@@ -98,6 +106,6 @@ public class Ghost : MonoBehaviour {
 		float direction = spriteFlipped;
 		GameObject missile = Instantiate (projectile);
 		missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
-		missile.GetComponent <Missile>().Initialize(Vector3.right * direction, 8.0f);
+		missile.GetComponent <Missile>().Initialize(Vector3.right * direction, projectileSpeed * playbackRate);
 	}
 }

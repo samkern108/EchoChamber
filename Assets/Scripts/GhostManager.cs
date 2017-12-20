@@ -23,6 +23,7 @@ public class GhostManager : MonoBehaviour, IRestartObserver {
 
 		// Restart ghost routines
 		foreach (Ghost child in children) {
+			child.gameObject.SetActive (true);
 			child.EnactRoutine ();
 		}
 	}
