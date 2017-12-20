@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
+public class EnemyManager : MonoBehaviour, IRestartObserver, IPlayerObserver, ICheckpointObserver {
 
 	public static EnemyManager self;
 	public GameObject p_enemy;
@@ -12,9 +12,15 @@ public class EnemyManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 		self = this;
 		NotificationMaster.restartObservers.Add (this);
 		NotificationMaster.playerObservers.Add (this);
+		NotificationMaster.checkpointObservers.Add (this);
 	}
 
-	public void SpawnEnemy() {
+	public void CheckpointActivated() {
+		// Disabling until we figure out what the gameplay is :3
+		// SpawnEnemy();
+	}
+
+	private void SpawnEnemy() {
 		GameObject enemy = GameObject.Instantiate (p_enemy);
 		enemy.transform.SetParent (this.transform);
 	}

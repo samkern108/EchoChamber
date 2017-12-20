@@ -13,11 +13,11 @@ public class Exit : MonoBehaviour, IRestartObserver {
 
 	void OnTriggerEnter2D(Collider2D coll) {
 		if (!activated) {
+			Debug.Log ("Exit activated");
+			NotificationMaster.SendCheckpointReachedNotification ();
 			AudioManager.PlayDotPickup ();
 			activated = true;
-			EnemyManager.self.SpawnEnemy ();
 			RepositionExit ();
-			UIManager.instance.IncrementExits ();
 		}
 	}
 

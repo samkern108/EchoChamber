@@ -7,7 +7,7 @@ public class Animate : MonoBehaviour {
 
 	private SpriteRenderer spriteRenderer;
 
-	public void Start() {
+	public void Awake() {
 		spriteRenderer = GetComponent <SpriteRenderer>();
 	}
 
@@ -24,6 +24,7 @@ public class Animate : MonoBehaviour {
 		float timer = 0;
 		while(timer <= duration) {
 			timer = Time.time - startTime;
+			Debug.Log (spriteRenderer);
 			spriteRenderer.color = Color.Lerp (start, finish, timer/duration);
 			yield return 0;
 		}

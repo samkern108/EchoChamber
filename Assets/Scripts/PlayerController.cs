@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using Prime31;
 
-public class PlayerController : MonoBehaviour, IRestartObserver {
+public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObserver {
 
 	// Tells us what our collison state was in the last frame
 	public CharacterController2D.CharacterCollisionState2D flags;
@@ -39,10 +39,10 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	void Awake()
 	{
 		NotificationMaster.restartObservers.Add (this);
+		NotificationMaster.checkpointObservers.Add (this);
+
 		_animator = GetComponent<Animator>();
 		_controller = GetComponent<CharacterController2D>();
-
-		_controller.onTriggerEnterEvent += onTriggerEnterEvent;
 
 		PlayerTransform = transform;
 		playerSize = GetComponent <SpriteRenderer> ().bounds.size;
@@ -52,28 +52,14 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		_animator.Play("Appear");
 	}
 
-	#region Event Listeners
-
-	private bool activated = false;
-	void onTriggerEnterEvent( Collider2D col )
-	{
-		if (col.tag == "Exit") {
-			activated = true;
-			float[] ghostPositionsChopped = new float[index + 1];
-			Array.Copy (ghostActions, ghostPositionsChopped, index);
-			ghostActions = new float[500];
-			index = 0;
-			GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped);
-			Invoke ("Deactivate", .5f);
-		}
+	public void CheckpointActivated() {
+		Debug.Log ("Checkpoint Activated in PlayerController");
+		float[] ghostPositionsChopped = new float[index + 1];
+		Array.Copy (ghostActions, ghostPositionsChopped, index);
+		ghostActions = new float[500];
+		index = 0;
+		GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped);
 	}
-
-	// Just so the player can't touch exits twice
-	public void Deactivate() {
-		activated = false;
-	}
-
-	#endregion
 
 	private bool shooting = true;
 

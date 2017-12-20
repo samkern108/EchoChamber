@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour, IRestartObserver {
+public class UIManager : MonoBehaviour, IRestartObserver, ICheckpointObserver {
 
 	public Text exitsText;
 	public static UIManager instance;
@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour, IRestartObserver {
 	public void Start() {
 		instance = this;
 		NotificationMaster.restartObservers.Add (this);
+		NotificationMaster.checkpointObservers.Add (this);
 	}
 
 	public void Update() {
@@ -21,7 +22,7 @@ public class UIManager : MonoBehaviour, IRestartObserver {
 		}
 	}
 
-	public void IncrementExits() {
+	public void CheckpointActivated() {
 		exitsCompleted++;
 		exitsText.text = "" + exitsCompleted;
 	}

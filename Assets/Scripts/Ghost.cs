@@ -22,9 +22,7 @@ public class Ghost : MonoBehaviour {
 
 	private Color currentColor;
 
-	public void Initialize (float[] positions) {
-		this.positions = positions;
-
+	public void Awake() {
 		spriteRenderer = GetComponent <SpriteRenderer> ();
 		animator = GetComponent <Animator>();
 		animate = GetComponent <Animate>();
@@ -34,6 +32,10 @@ public class Ghost : MonoBehaviour {
 		currentColor = Palette.GhostColor;
 		currentColor.a = .9f;
 		spriteRenderer.color = currentColor;
+	}
+
+	public void Initialize (float[] positions) {
+		this.positions = positions;
 	}
 
 	public void EnactRoutine () {
