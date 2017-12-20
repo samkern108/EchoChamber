@@ -86,7 +86,7 @@ public class Enemy : MonoBehaviour {
 		AudioManager.PlayEnemyShoot ();
 		animator.Play ("Shoot");
 		Vector3 direction = (PlayerController.PlayerPosition - transform.position).normalized;
-		GameObject missile = Instantiate (projectile);
+		GameObject missile = Instantiate (projectile, ProjectileManager.myTransform);
 		missile.transform.position = transform.position;
 		missile.GetComponent <Missile>().Initialize(direction, projectileSpeed);
 	}

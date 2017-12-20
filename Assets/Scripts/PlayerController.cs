@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			Vector2 direction = new Vector2(x, y).normalized;
 			if (direction == Vector2.zero)
 				direction.x = spriteFlipped;
-			GameObject missile = Instantiate (projectile);
+			GameObject missile = Instantiate (projectile, ProjectileManager.myTransform);
 			missile.transform.position = transform.position + Vector3.Scale(playerSize, direction.normalized);
 			missile.GetComponent <Missile>().Initialize(direction.normalized, projectileSpeed);
 

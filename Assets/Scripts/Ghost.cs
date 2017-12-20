@@ -104,7 +104,7 @@ public class Ghost : MonoBehaviour {
 		animate.AnimateToColor (Color.red,currentColor,.3f);
 		AudioManager.PlayEnemyShoot ();
 		float direction = spriteFlipped;
-		GameObject missile = Instantiate (projectile);
+		GameObject missile = Instantiate (projectile, ProjectileManager.myTransform);
 		missile.transform.position = transform.position + new Vector3((playerWidth * direction), 0, 0);
 		missile.GetComponent <Missile>().Initialize(Vector3.right * direction, projectileSpeed * playbackRate);
 	}
