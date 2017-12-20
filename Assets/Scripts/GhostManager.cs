@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GhostManager : MonoBehaviour, IRestartObserver {
@@ -21,11 +22,18 @@ public class GhostManager : MonoBehaviour, IRestartObserver {
 		ghost.GetComponent <Ghost>().Initialize(ghostPositions);
 		children.Add (ghost.GetComponent <Ghost>());
 
+		List<Ghost> ghostsToRemove = new List<Ghost> ();
 		// Restart ghost routines
 		foreach (Ghost child in children) {
+			if (!child) {
+				ghostsToRemove.Add (child);
+				continue;
+			}
 			child.gameObject.SetActive (true);
 			child.EnactRoutine ();
 		}
+
+		children = children.Except(ghostsToRemove).ToList();
 	}
 
 	public void Restart() {

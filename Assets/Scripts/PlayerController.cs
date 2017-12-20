@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	public Vector3 _velocity;
 
 	public GameObject projectile;
-	private Vector2 playerSize;
+	private Vector2 playerSize, playerExtents;
 	private float projectileSpeed = 8.0f;
 
 	private static int index = 0;
@@ -46,19 +46,11 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 
 		PlayerTransform = transform;
 		playerSize = GetComponent <SpriteRenderer> ().bounds.size;
+		playerExtents = GetComponent <SpriteRenderer> ().bounds.extents;
 	}
 
-	public void OnEnable() {
-		_animator.Play("Appear");
-	}
-
-	public void CheckpointActivated() {
-		Debug.Log ("Checkpoint Activated in PlayerController");
-		float[] ghostPositionsChopped = new float[index + 1];
-		Array.Copy (ghostActions, ghostPositionsChopped, index);
-		ghostActions = new float[500];
-		index = 0;
-		GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped);
+	public void Start() {
+		SpawnPlayer ();
 	}
 
 	private bool shooting = true;
@@ -182,9 +174,32 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		get { return _playerTransform.position; }
 	}
 
-	public void Restart() {
-		transform.position = Vector3.zero;
-		gameObject.SetActive (true);
+	public void CheckpointActivated() {
+		float[] ghostPositionsChopped = new float[index + 1];
+		Array.Copy (ghostActions, ghostPositionsChopped, index);
 		ghostActions = new float[500];
+		index = 0;
+		GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped);
+	}
+
+	public void OnEnable() {
+		_animator.Play("Appear");
+	}
+
+	private void SpawnPlayer() {
+		Vector3 newPosition = Vector3.zero;
+		RaycastHit2D hit = Physics2D.Linecast (transform.position + new Vector3(0, playerExtents.y, 0), newPosition - new Vector3(0, playerExtents.y, 0), 1 << LayerMask.NameToLayer("Wall"));
+		if (hit.collider) {
+			newPosition.y = hit.transform.position.y + hit.transform.GetComponent<SpriteRenderer>().bounds.extents.y + playerExtents.y;
+		}
+		transform.position = newPosition;
+
+		ghostActions = new float[500];
+		index = 0;
+	}
+
+	public void Restart() {
+		SpawnPlayer ();
+		gameObject.SetActive (true);
 	}
 }

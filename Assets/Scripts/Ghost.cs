@@ -21,7 +21,7 @@ public class Ghost : MonoBehaviour {
 	private float projectileSpeed = 8.0f;
 
 	private Vector3 oldPosition, nextPosition;
-	private float playbackRate = .8f, lerpFraction = .0f;
+	private float playbackRate = 1f, lerpFraction = .0f;
 
 	private Color currentColor;
 
@@ -43,14 +43,16 @@ public class Ghost : MonoBehaviour {
 
 	public void EnactRoutine () {
 		currentColor.a -= .05f;
+		playbackRate -= .1f;
 
-		if (currentColor.a <= 0) {
+		if (playbackRate <= 0) {
 			Destroy (this.gameObject);
 		}
 
-		animate.AnimateToColor (Palette.invisible,currentColor,.3f);
 		active = true;
 		positionIndex = 0;
+		transform.position = new Vector3 (positions [positionIndex], positions [positionIndex + 1], 0);
+		animate.AnimateToColor (Palette.invisible,currentColor,.3f);
 	}
 
 	private void SetInactive() {
