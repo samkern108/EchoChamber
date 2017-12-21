@@ -22,6 +22,8 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void Start () {
+		detectionRadius = Room.bounds.extents.x;
+
 		size = GetComponent <SpriteRenderer>().bounds.extents;
 
 		startPosition = Room.GetRandomPointOnFloorAvoidingPoints (new Vector2[]{PlayerController.PlayerPosition}, size);
@@ -39,17 +41,17 @@ public class Enemy : MonoBehaviour {
 	void Update () {
 		RaycastHit2D hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
 		if (hit.collider.tag == "Wall" || (hit.collider.tag == "Player" && hit.distance > detectionRadius)) {
-			//MoveToStart ();
+			MoveToStart ();
 			if (detectedPlayer) {
 				detectedPlayer = false;
 				animate.AnimateToColor (Palette.EnemyColor, Color.yellow, .3f);
 			}
 			return;
 		} else {
-			//MoveToPlayer ();
+			MoveToPlayer ();
 			if (!detectedPlayer) {
 				detectedPlayer = true;
-				animate.AnimateToColor (Color.yellow, Palette.EnemyColor, detectionRampUp);
+				animate.AnimateToColor (Color.yellow, Palette.EnemyColor, .1f);
 
 				if (!shooting) {
 					StartCoroutine ("Co_Shoot");
@@ -80,7 +82,7 @@ public class Enemy : MonoBehaviour {
 	}
 
 	private bool shooting = false;
-	private float detectionRampUp = .3f;
+	private float detectionRampUp = .7f;
 	private float shootCooldown = 1.0f;
 	private float projectileSpeed = 7.0f;
 	private IEnumerator Co_Shoot()
