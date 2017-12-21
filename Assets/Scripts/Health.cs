@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Health : MonoBehaviour {
 
+	public GameObject deathExplosion;
 	// Totally not working. CharacterController2D is the suspect.
 	/*public void OnCollisionEnter2D(Collision2D coll) {
 		if (coll.gameObject.tag == "Enemy" || coll.gameObject.tag == "Projectile" || coll.gameObject.tag == "EnemyProjectile" || coll.gameObject.tag == "Ghost") {
@@ -21,6 +22,7 @@ public class Health : MonoBehaviour {
 	private void Die() {
 		NotificationMaster.SendPlayerDeathNotification ();
 		AudioManager.PlayPlayerDeath ();
+		Instantiate (deathExplosion, transform.position, Quaternion.identity);
 		gameObject.SetActive (false);
 	}
 }
