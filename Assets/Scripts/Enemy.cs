@@ -96,7 +96,7 @@ public class Enemy : MonoBehaviour {
 		Vector3 targetPosition = PlayerController.PlayerPosition;
 		targetPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		targetPosition.y = transform.position.y;
-		Vector3 newPosition = Vector3.Lerp(transform.position, targetPosition, 2.0f * Time.deltaTime);
+		Vector3 newPosition = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime);
 		//Vector3 newPosition = Vector3.SmoothDamp( transform.position, targetPosition, ref _smoothDampVelocity, smoothDampTime );
 		// TODO(samkern): Which looks better, smoothdamp or lerp?
 		transform.position = newPosition;

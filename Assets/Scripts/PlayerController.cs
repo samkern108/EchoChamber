@@ -13,8 +13,8 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	public bool isJumping;
 
 	// movement config
-	private float gravity = -40f;
-	private float runSpeed = 8f;
+	private float gravity = -30f;
+	private float runSpeed = 7f;
 	private float groundDamping = 20f; // how fast do we change direction? higher means faster
 	private float inAirDamping = 5f;
 	private float jumpHeight = 3f;
