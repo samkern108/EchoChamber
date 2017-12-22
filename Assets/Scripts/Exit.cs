@@ -21,7 +21,16 @@ public class Exit : MonoBehaviour, IRestartObserver {
 	}
 
 	void RepositionExit() {
-		transform.position = Room.GetRandomPointInRoomAvoidingPoints(new Vector2[]{transform.position, PlayerController.PlayerPosition});
+		Vector3 point;
+		float distance, minDistance;
+		do {
+			point = Room.GetRandomPointInRoom ();
+
+			distance = Vector2.Distance (PlayerController.PlayerPosition, point);
+			minDistance = 2.0f;
+		} while (distance < minDistance);
+			
+		transform.position = point;
 		activated = false;
 	}
 

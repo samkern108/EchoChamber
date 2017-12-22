@@ -43,9 +43,8 @@ public class Ghost : MonoBehaviour {
 		currentColor.a -= .05f;
 		playbackRate -= .1f;
 
-		if (playbackRate <= 0) {
+		if (playbackRate <= 0)
 			Destroy (this.gameObject);
-		}
 
 		active = true;
 		positionIndex = 0;
@@ -63,18 +62,16 @@ public class Ghost : MonoBehaviour {
 			animate.AnimateToColor (currentColor, Palette.Invisible, .3f);
 			Invoke ("SetInactive", .3f);
 		}
-		if (!active) {
+		if (!active)
 			return;
-		}
 
 		lerpFraction += playbackRate;
 
 		if (lerpFraction >= 1.0f) {
 			lerpFraction -= 1.0f;
 
-			if (((positionIndex + (4 * 30) - 1) < positions.Length) && (positions [positionIndex + (4 * 30) - 1] == 1)) {
+			if (((positionIndex + (4 * 30) - 1) < positions.Length) && (positions [positionIndex + (4 * 30) - 1] == 1))
 				TelemarkShoot ();
-			}
 
 			oldPosition = nextPosition;
 
@@ -85,9 +82,8 @@ public class Ghost : MonoBehaviour {
 				spriteFlipped *= -1;
 				GetComponent<SpriteRenderer> ().flipX = (spriteFlipped == -1);
 			}
-			if (positions [positionIndex++] == 1) {
+			if (positions [positionIndex++] == 1)
 				Shoot ();
-			}
 		}
 
 		transform.position = Vector3.Lerp (oldPosition, nextPosition, lerpFraction);
