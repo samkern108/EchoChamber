@@ -53,9 +53,8 @@ public class Enemy : MonoBehaviour {
 				detectedPlayer = true;
 				animate.AnimateToColor (Color.yellow, Palette.EnemyColor, .1f);
 
-				if (!shooting) {
+				if (!shooting)
 					StartCoroutine ("Co_Shoot");
-				}
 			}
 		}
 	}

@@ -183,6 +183,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	}
 
 	public void Restart() {
+		_velocity = Vector3.zero;
 		SpawnPlayer ();
 		gameObject.SetActive (true);
 	}
