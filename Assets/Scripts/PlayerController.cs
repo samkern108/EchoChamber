@@ -170,11 +170,16 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		GetComponent <SpriteRenderer>().color = Palette.Invisible;
 
 		Vector3 newPosition = Vector3.zero;
-		RaycastHit2D hit = Physics2D.Linecast (transform.position + new Vector3(0, playerExtents.y, 0), newPosition - new Vector3(0, playerExtents.y, 0), 1 << LayerMask.NameToLayer("Wall"));
-		if (hit.collider) {
-			newPosition.y = hit.transform.position.y + hit.transform.GetComponent<SpriteRenderer>().bounds.extents.y + playerExtents.y;
+		RaycastHit2D hit;
+		// Uhh this is hacky but whatever
+		for(int i = 0; i < 5; i++) {
+			hit = Physics2D.Linecast (transform.position + new Vector3(0, playerExtents.y, 0), newPosition - new Vector3(0, playerExtents.y * 2, 0), 1 << LayerMask.NameToLayer("Wall"));
+			if (hit.collider) {
+				newPosition.y = hit.transform.position.y + hit.transform.GetComponent<SpriteRenderer> ().bounds.extents.y + playerExtents.y;
+				transform.position = newPosition;
+				break;
+			}
 		}
-		transform.position = newPosition;
 
 		ghostActions = new float[500];
 		index = 0;
