@@ -7,14 +7,14 @@ public class GhostManager : MonoBehaviour, IRestartObserver {
 
 	public GameObject p_ghost;
 	public static GhostManager instance;
-	public List<Ghost> children = new List<Ghost> ();
+	public List<GhostAI> children = new List<GhostAI> ();
 
 	public void Start() {
 		instance = this;
 		NotificationMaster.restartObservers.Add (this);
 	}
 
-	public void StartCapturingNewGhost(float[] ghostPositions) {
+/*	public void StartCapturingNewGhost(float[] ghostPositions) {
 
 		// Create new ghost
 		GameObject ghost = GameObject.Instantiate (p_ghost);
@@ -34,6 +34,15 @@ public class GhostManager : MonoBehaviour, IRestartObserver {
 		}
 
 		children = children.Except(ghostsToRemove).ToList();
+	}*/
+
+	public void StartCapturingNewGhost(GhostAIStats stats) {
+
+		// Create new ghost
+		GameObject ghost = GameObject.Instantiate (p_ghost);
+		ghost.transform.SetParent(transform);
+		ghost.GetComponent <GhostAI>().Initialize(stats);
+		children.Add (ghost.GetComponent <GhostAI>());
 	}
 
 	public void Restart() {

@@ -1,26 +1,16 @@
-﻿using System.Collections;
+﻿/*using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
 using Prime31;
 
-
-public struct GhostAIStats {
-
-	// aggressiveness can be measured by power level of enemies on screen compared to power level of enemies killed, enemies dodged in close quarters, shots fired, etc
-	public int shotsFired;
-	public int enemiesKilled;
-
-	// movement should be a factor of average speed, number of jumps, percentage of the map covered, starting/ending position, etc.
-}
-
-
-public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObserver {
-
-	public GhostAIStats ghostStats = new GhostAIStats();
+public class PlayerControllerOld : MonoBehaviour, IRestartObserver, ICheckpointObserver {
 
 	// Tells us what our collison state was in the last frame
 	public CharacterController2D.CharacterCollisionState2D flags;
+
+	public bool isGrounded;
+	public bool isJumping;
 
 	// movement config
 	private float gravity = -30f;
@@ -40,10 +30,13 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	private RaycastHit2D _lastControllerColliderHit;
 	public Vector3 _velocity;
 
-	private bool shooting = true, doubleJumping = false;
+	private bool shooting = true, jumping = false, doubleJumping = false;
 	public GameObject projectile;
 	private Vector2 playerSize, playerExtents;
 	private float projectileSpeed = 8.0f;
+
+	private static int index = 0;
+	private static float[] ghostActions = new float[500];
 
 	void Awake()
 	{
@@ -89,13 +82,10 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			GameObject missile = Instantiate (projectile, ProjectileManager.myTransform);
 			missile.transform.position = transform.position + Vector3.Scale(playerSize, direction.normalized);
 			missile.GetComponent <Missile>().Initialize(direction.normalized, projectileSpeed);
-		}
 
-		// xbox
-		/*float fireX = Input.GetAxis ("FireX");
-		float fireY = Input.GetAxis ("FireY");
-		if (Mathf.Abs(fireX) > .5f||Mathf.Abs(fireY) > .5f)
-			fire = true;*/
+			// for the ghost
+			shoot = true;
+		}
 
 		if(Mathf.Abs(x) > .3)
 		{
@@ -107,6 +97,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			normalizedHorizontalSpeed = 0;
 
 		if (_controller.isGrounded) {
+			jumping = false;
 			doubleJumping = false;
 			_velocity.y = 0;
 
@@ -144,7 +135,23 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
 	}
-		
+
+	private bool shoot = false;
+
+	public void FixedUpdate() {
+		ghostActions [index++] = transform.position.x;
+		ghostActions [index++] = transform.position.y;
+		ghostActions [index++] = spriteFlipped;
+		ghostActions [index++] = shoot ? 1 : -1;
+		shoot = false;
+
+		if (index >= ghostActions.Length - 5) {
+			float[] temp = new float[ghostActions.Length * 2];
+			ghostActions.CopyTo(temp, 0);
+			ghostActions = temp;
+		}
+	}
+
 	public void FlipPlayer() {
 		AudioManager.PlayPlayerTurn ();
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
@@ -152,8 +159,11 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	}
 
 	public void CheckpointActivated() {
-		ghostStats = new GhostAIStats ();
-		GhostManager.instance.StartCapturingNewGhost (ghostStats);
+		float[] ghostPositionsChopped = new float[index + 1];
+		Array.Copy (ghostActions, ghostPositionsChopped, index);
+		ghostActions = new float[500];
+		index = 0;
+		GhostManager.instance.StartCapturingNewGhost (ghostPositionsChopped);
 	}
 
 	private void SpawnPlayer() {
@@ -170,8 +180,9 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 				break;
 			}
 		}
-			
-		ghostStats = new GhostAIStats ();
+
+		ghostActions = new float[500];
+		index = 0;
 
 		_animate.AnimateToColor (Palette.Invisible, Palette.PlayerColor, .5f);
 	}
@@ -191,3 +202,4 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		get { return _playerTransform.position; }
 	}
 }
+*/
