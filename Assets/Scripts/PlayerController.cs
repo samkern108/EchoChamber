@@ -118,6 +118,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		} else {
 			if (!doubleJumping && jump) {
 				doubleJumping = true;
+				AudioManager.PlayPlayerJump ();
 				_velocity.y = Mathf.Sqrt (2f * doubleJumpHeight * -gravity);
 			}
 			else if (jumpCancel && (_velocity.y > 0))
