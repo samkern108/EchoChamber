@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	private float groundDamping = 20f; // how fast do we change direction? higher means faster
 	private float inAirDamping = 5f;
 	private float jumpHeight = 3f;
+	private float doubleJumpHeight = 2f;
 
 	private float normalizedHorizontalSpeed = 0;
 
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	private RaycastHit2D _lastControllerColliderHit;
 	public Vector3 _velocity;
 
-	private bool shooting = true;
+	private bool shooting = true, jumping = false, doubleJumping = false;
 	public GameObject projectile;
 	private Vector2 playerSize, playerExtents;
 	private float projectileSpeed = 8.0f;
@@ -56,13 +57,16 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		SpawnPlayer ();
 	}
 
-	// the Update loop contains a very simple example of moving the character around and controlling the animation
 	void Update()
 	{
 		float x = Input.GetAxis("Horizontal");
 		float y = Input.GetAxis ("Vertical");
 
+		bool jump = Input.GetKeyDown (KeyCode.JoystickButton18) || Input.GetKeyDown (KeyCode.UpArrow);
+		bool jumpCancel = Input.GetKeyUp (KeyCode.JoystickButton18) || Input.GetKeyUp (KeyCode.UpArrow);
+
 		bool fire = Input.GetAxisRaw ("Fire") <= 0.0f;
+
 		if (!fire)
 			shooting = false;
 		else if (fire && !shooting) {
@@ -83,10 +87,6 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			shoot = true;
 		}
 
-
-		bool jump = Input.GetKeyDown (KeyCode.JoystickButton18) || Input.GetKeyDown (KeyCode.UpArrow);
-		bool jumpCancel = Input.GetKeyUp (KeyCode.JoystickButton18) || Input.GetKeyUp (KeyCode.UpArrow);
-
 		// xbox
 		/*float fireX = Input.GetAxis ("FireX");
 		float fireY = Input.GetAxis ("FireY");
@@ -103,6 +103,8 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			normalizedHorizontalSpeed = 0;
 
 		if (_controller.isGrounded) {
+			jumping = false;
+			doubleJumping = false;
 			_velocity.y = 0;
 
 			// we can only jump whilst grounded
@@ -110,13 +112,17 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 				_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
 				AudioManager.PlayPlayerJump ();
 			}
-		}
-		else
-			if (jumpCancel && (_velocity.y > 0))
+		} else {
+			if (!doubleJumping && jump) {
+				doubleJumping = true;
+				_velocity.y = Mathf.Sqrt (2f * doubleJumpHeight * -gravity);
+			}
+			else if (jumpCancel && (_velocity.y > 0))
 				_velocity.y *= .5f;
+		}
 
 		// apply horizontal speed smoothing it. dont really do this with Lerp. Use SmoothDamp or something that provides more control
-		var smoothedMovementFactor = _controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
+		var smoothedMovementFactor = groundDamping;//_controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
 		_velocity.x = Mathf.Lerp( _velocity.x, normalizedHorizontalSpeed * runSpeed, Time.deltaTime * smoothedMovementFactor );
 
 		// apply gravity before moving
