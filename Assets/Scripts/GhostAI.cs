@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GhostAI : MonoBehaviour {
 
-	private GhostAIStats stats;
+	public GhostAIStats stats;
 
 	public GameObject projectile;
 
@@ -21,6 +21,10 @@ public class GhostAI : MonoBehaviour {
 
 	public void Initialize(GhostAIStats stats) {
 		this.stats = stats;
+		if (stats.shotsFired > 0) {
+			gameObject.AddComponent <GhostAIShoot>();
+			GetComponent<GhostAIShoot> ().Initialize (stats);
+		}
 
 		detectionRadius = Room.bounds.extents.x;
 

@@ -8,14 +8,30 @@ using Prime31;
 public struct GhostAIStats {
 
 	// aggressiveness can be measured by power level of enemies on screen compared to power level of enemies killed, enemies dodged in close quarters, shots fired, etc
+
+	// raw stats
 	public int shotsFired;
 	public int enemiesKilled;
+	public int totalEnemies;
+
+	public float totalEnemyAggressiveness;
+	public float killedEnemyAggressiveness;
+
+	// speed can be based on time spent in the level, or perhaps health?
+
+	// dexterity based on shots dodged?
+
+	// mobility can be based on total ground covered? or total time spent moving?
+
+	public float Aggressiveness() {
+		return killedEnemyAggressiveness / totalEnemyAggressiveness;
+	}
 
 	// movement should be a factor of average speed, number of jumps, percentage of the map covered, starting/ending position, etc.
 }
 
 
-public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObserver {
+public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObserver, IGhostDeathObserver {
 
 	public GhostAIStats ghostStats = new GhostAIStats();
 
@@ -80,6 +96,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			_animate.AnimateToColorAndBack (Palette.PlayerColor, Color.red, .05f);
 
 			shooting = true;
+			ghostStats.shotsFired++;
 			AudioManager.PlayEnemyShoot ();
 
 			//float direction = spriteFlipped ? -1 : 1;
@@ -153,8 +170,13 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	}
 
 	public void CheckpointActivated() {
-		ghostStats = new GhostAIStats ();
+		ghostStats.totalEnemies = GhostManager.instance.children.Count;
 		GhostManager.instance.StartCapturingNewGhost (ghostStats);
+		ghostStats = new GhostAIStats ();
+	}
+
+	public void GhostDied(GhostAIStats stats) {
+		ghostStats.enemiesKilled++;
 	}
 
 	private void SpawnPlayer() {

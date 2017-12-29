@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GhostManager : MonoBehaviour, IRestartObserver {
+public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 
 	public GameObject p_ghost;
 	public static GhostManager instance;
@@ -51,6 +51,12 @@ public class GhostManager : MonoBehaviour, IRestartObserver {
 			Transform child = transform.GetChild (0);
 			child.parent = null;
 			Destroy (child.gameObject);
+		}
+	}
+
+	public void PlayerDied() {
+		foreach (GhostAI ai in children) {
+			ai.enabled = false;
 		}
 	}
 }

@@ -13,6 +13,9 @@ public class EnemyHealth : MonoBehaviour {
 	private void Die() {
 		AudioManager.PlayEnemyDeath ();
 		Instantiate (deathExplosion, transform.position, Quaternion.identity);
+		GetComponent <Animate>().enabled = false;
 		GameObject.Destroy (this.gameObject);
+		if(GetComponent<GhostAI>())
+			NotificationMaster.SendGhostDeathNotification (GetComponent<GhostAI>().stats);
 	}
 }
