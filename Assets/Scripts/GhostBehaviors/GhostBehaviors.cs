@@ -60,9 +60,9 @@ public class GhostMovement : MonoBehaviour {
 
 	public void Update() {
 		moveDelegate ();
-		if (Vector2.Distance (targetPosition, transform.position) > .01f) {
+		//if (Vector2.Distance (targetPosition, transform.position) > .01f) {
 			MoveToTarget ();
-		}
+		//}
 	}
 
 	public void Attack() {
@@ -85,7 +85,7 @@ public class GhostMovement : MonoBehaviour {
 		// TODO(samkern): Which looks better, smoothdamp or lerp?
 		transform.position = newPosition;
 
-		if (Mathf.Abs (newPosition.x - floor.center.x) >= (floor.extents.x - .5f)) {
+		if (_controller.isGrounded && Mathf.Abs (newPosition.x - floor.center.x) >= (floor.extents.x - .5f)) {
 			_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
 		}
 
