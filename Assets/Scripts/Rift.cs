@@ -21,7 +21,6 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		timeOpened = Time.time;
 
 		ghostStats = new GhostAIStats ();
-		ghostStats.Init ();
 		ghostStats.totalGhostsInLevel = GhostManager.instance.children.Count;
 		ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
 
@@ -73,10 +72,6 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 	}
 
 	public void Restart() {
-		// TODO(samkern): Make removing observers safe.
-		NotificationMaster.restartObservers.Remove (this);
-		this.enabled = false;
-		animate.enabled = false;
 		Destroy (this.gameObject);
 	}
 

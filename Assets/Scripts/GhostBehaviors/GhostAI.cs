@@ -4,25 +4,16 @@ using UnityEngine;
 
 public class GhostAIStats {
 
-	public float Level() {
-		return ghostsKilled;
-	}
-
-	public void Init() {
-		ghostNum = GhostManager.ghostCounter;
-	}
-
 	public float Aggressiveness() {
-		return (shotsFired / timeOpen) * 2;
+		Debug.Log ((ghostsKilled + 1) * (1 / (totalGhostsInLevel + 1)));
+		return (ghostsKilled + 1) * (1 / (totalGhostsInLevel + 1));
 	}
-
-	// raw stats
+		
 	public int shotsFired;
 	public int ghostsKilled;
 	public int totalGhostsInLevel;
 
 	public float timeOpen;
-	public int ghostNum;
 
 	public float size;
 
@@ -30,11 +21,8 @@ public class GhostAIStats {
 	public float killedGhostAggressiveness;
 
 	// speed can be based on time spent in the level, or perhaps health?
-
 	// dexterity based on shots dodged?
-
 	// mobility can be based on total ground covered? or total time spent moving?
-
 	// movement should be a factor of average speed, number of jumps, percentage of the map covered, starting/ending position, etc.
 }
 
@@ -92,6 +80,26 @@ public class GhostAI : MonoBehaviour {
 		GetComponent <SpriteRenderer> ().color = Palette.Invisible;
 	}
 
+	void Update () {
+		RaycastHit2D hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
+		if (hit.collider.tag == "Wall" || (hit.collider.tag == "Player" && hit.distance > detectionRadius)) {
+			if (detectedPlayer) {
+				detectedPlayer = false;
+				movement.SetMovementState (GhostMovementState.Idle);
+				if(attack) attack.StopShooting ();
+				animate.AnimateToColor (Palette.EnemyColor, color, .3f);
+			}
+			return;
+		} else {
+			if (!detectedPlayer) {
+				detectedPlayer = true;
+				movement.SetMovementState (GhostMovementState.Attack);
+				if(attack) attack.StartShooting ();
+				animate.AnimateToColor (color, Palette.EnemyColor, .1f);
+			}
+		}
+	}
+
 	/** Tries to avoid positioning the point too near the player (and perhaps too near other enemies?). */
 	private Vector3 GetSpawnPosition() {
 		Vector3 point;
@@ -112,38 +120,16 @@ public class GhostAI : MonoBehaviour {
 			}
 
 			hit = Physics2D.Raycast (point - new Vector3(size.x * 2, 0, 0), Vector2.left, .5f, 1 << LayerMask.NameToLayer ("Wall"));
-			if (hit.collider) {
+			if (hit.collider)
 				point.x = hit.collider.transform.position.x + hit.collider.GetComponent<SpriteRenderer> ().bounds.extents.x + size.x;
-			}
 
 			hit = Physics2D.Raycast (point + new Vector3(size.x * 2, 0, 0), Vector2.right, .5f, 1 << LayerMask.NameToLayer ("Wall"));
-			if (hit.collider) {
+			if (hit.collider)
 				point.x = hit.collider.transform.position.x - hit.collider.GetComponent<SpriteRenderer> ().bounds.extents.x - size.x;
-			}
 
 			distance = Vector2.Distance(PlayerController.PlayerPosition, point);
 		} while (distance < minDistance);
 
 		return point;
-	}
-
-	void Update () {
-		RaycastHit2D hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
-		if (hit.collider.tag == "Wall" || (hit.collider.tag == "Player" && hit.distance > detectionRadius)) {
-			if (detectedPlayer) {
-				detectedPlayer = false;
-				movement.SetMovementState (GhostMovementState.Idle);
-				if(attack) attack.StopShooting ();
-				animate.AnimateToColor (Palette.EnemyColor, color, .3f);
-			}
-			return;
-		} else {
-			if (!detectedPlayer) {
-				detectedPlayer = true;
-				movement.SetMovementState (GhostMovementState.Attack);
-				if(attack) attack.StartShooting ();
-				animate.AnimateToColor (color, Palette.EnemyColor, .1f);
-			}
-		}
 	}
 }

@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 
-	public static int ghostCounter = 0;
 	public GameObject p_ghost;
 	public static GhostManager instance;
 	public List<GhostAI> children = new List<GhostAI> ();
@@ -29,7 +28,6 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 		ghost.transform.SetParent(transform);
 		ghost.GetComponent <GhostAI>().Initialize(stats);
 		children.Add (ghost.GetComponent <GhostAI>());
-		ghostCounter++;
 	}
 
 	public void Restart() {

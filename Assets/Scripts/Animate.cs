@@ -56,4 +56,8 @@ public class Animate : MonoBehaviour {
 			Timing.RunCoroutine (C_AnimateToColorAndBack(finish, start, duration, false));
 		}
 	}
+
+	void OnDestroy() {
+		StopAllCoroutines ();
+	}
 }
