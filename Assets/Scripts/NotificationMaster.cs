@@ -12,9 +12,14 @@ public interface IPlayerObserver
 	void PlayerDied();
 }
 
+public interface IPlayerShootObserver
+{
+	void PlayerShoot();
+}
+
 public interface ICheckpointObserver
 {
-	void CheckpointActivated();
+	void CheckpointActivated(float timeOpen);
 }
 
 public interface IGhostDeathObserver
@@ -28,6 +33,7 @@ public class NotificationMaster : MonoBehaviour {
 	public static List<IPlayerObserver> playerObservers = new List<IPlayerObserver> ();
 	public static List<ICheckpointObserver> checkpointObservers = new List<ICheckpointObserver> ();
 	public static List<IGhostDeathObserver> ghostDeathObservers = new List<IGhostDeathObserver> ();
+	public static List<IPlayerShootObserver> playerShootObservers = new List<IPlayerShootObserver> ();
 
 	public static void SendRestartNotification() {
 		foreach(IRestartObserver o in restartObservers) {
@@ -41,9 +47,15 @@ public class NotificationMaster : MonoBehaviour {
 		}
 	}
 
-	public static void SendCheckpointReachedNotification() {
+	public static void SendPlayerShootNotification() {
+		foreach(IPlayerShootObserver o in playerShootObservers) {
+			o.PlayerShoot ();
+		}
+	}
+
+	public static void SendCheckpointReachedNotification(float timeOpen) {
 		foreach(ICheckpointObserver o in checkpointObservers) {
-			o.CheckpointActivated ();
+			o.CheckpointActivated (timeOpen);
 		}
 	}
 

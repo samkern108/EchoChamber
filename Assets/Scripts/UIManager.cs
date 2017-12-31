@@ -22,7 +22,7 @@ public class UIManager : MonoBehaviour, IRestartObserver, ICheckpointObserver {
 		}
 	}
 
-	public void CheckpointActivated() {
+	public void CheckpointActivated(float timeOpen) {
 		exitsCompleted++;
 		exitsText.text = "" + exitsCompleted;
 	}

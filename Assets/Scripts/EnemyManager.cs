@@ -15,7 +15,7 @@ public class EnemyManager : MonoBehaviour, IRestartObserver, IPlayerObserver, IC
 		NotificationMaster.checkpointObservers.Add (this);
 	}
 
-	public void CheckpointActivated() {
+	public void CheckpointActivated(float timeOpen) {
 		// Disabling until we figure out what the gameplay is :3
 		SpawnEnemy();
 	}

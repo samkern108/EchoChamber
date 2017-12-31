@@ -4,53 +4,7 @@ using System;
 using UnityEngine;
 using Prime31;
 
-public class GhostAIStats {
-
-	public float Level() {
-		return ghostsKilled;
-	}
-
-	public void Init() {
-		timeStartedLevel = Time.time;
-		ghostNum = GhostManager.ghostCounter;
-	}
-
-	public float TimeInLevel() {
-		Debug.Log ("TIL: " + (timeEndedLevel - timeStartedLevel));
-		return timeEndedLevel - timeStartedLevel;
-	}
-
-	public float Aggressiveness() {
-		return (shotsFired / TimeInLevel ()) * 2;
-	}
-
-	// aggressiveness can be measured by power level of enemies on screen compared to power level of enemies killed, enemies dodged in close quarters, shots fired, etc
-
-	// raw stats
-	public int shotsFired;
-	public int ghostsKilled;
-	public int totalGhostsInLevel;
-
-	public float timeStartedLevel;
-	public float timeEndedLevel;
-	public int ghostNum;
-
-	public float totalGhostAggressiveness;
-	public float killedGhostAggressiveness;
-
-	// speed can be based on time spent in the level, or perhaps health?
-
-	// dexterity based on shots dodged?
-
-	// mobility can be based on total ground covered? or total time spent moving?
-
-	// movement should be a factor of average speed, number of jumps, percentage of the map covered, starting/ending position, etc.
-}
-
-
-public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObserver, IGhostDeathObserver {
-
-	public GhostAIStats ghostStats = new GhostAIStats();
+public class PlayerController : MonoBehaviour, IRestartObserver {
 
 	// Tells us what our collison state was in the last frame
 	public CharacterController2D.CharacterCollisionState2D flags;
@@ -83,7 +37,6 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		GetComponent <SpriteRenderer>().color = Palette.Invisible;
 
 		NotificationMaster.restartObservers.Add (this);
-		NotificationMaster.checkpointObservers.Add (this);
 
 		_animate = GetComponent<Animate>();
 		_controller = GetComponent<CharacterController2D>();
@@ -113,7 +66,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 			_animate.AnimateToColorAndBack (Palette.PlayerColor, Color.red, .05f);
 
 			shooting = true;
-			ghostStats.shotsFired++;
+			NotificationMaster.SendPlayerShootNotification ();
 			AudioManager.PlayEnemyShoot ();
 
 			//float direction = spriteFlipped ? -1 : 1;
@@ -186,20 +139,6 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		spriteFlipped *= -1;
 	}
 
-	public void CheckpointActivated() {
-		ghostStats.timeEndedLevel = Time.time;
-		GhostManager.instance.StartCapturingNewGhost (ghostStats);
-		ghostStats = new GhostAIStats ();
-		ghostStats.Init ();
-		ghostStats.totalGhostsInLevel = GhostManager.instance.children.Count;
-		ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
-	}
-
-	public void GhostDied(GhostAIStats stats) {
-		ghostStats.ghostsKilled++;
-		ghostStats.killedGhostAggressiveness += stats.Aggressiveness ();
-	}
-
 	private void SpawnPlayer() {
 		GetComponent <SpriteRenderer>().color = Palette.Invisible;
 
@@ -216,8 +155,6 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 		}
 
 		_animate.AnimateToColor (Palette.Invisible, Palette.PlayerColor, .5f);
-		ghostStats = new GhostAIStats ();
-		ghostStats.Init ();
 	}
 
 	public void Restart() {

@@ -2,6 +2,42 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class GhostAIStats {
+
+	public float Level() {
+		return ghostsKilled;
+	}
+
+	public void Init() {
+		ghostNum = GhostManager.ghostCounter;
+	}
+
+	public float Aggressiveness() {
+		return (shotsFired / timeOpen) * 2;
+	}
+
+	// raw stats
+	public int shotsFired;
+	public int ghostsKilled;
+	public int totalGhostsInLevel;
+
+	public float timeOpen;
+	public int ghostNum;
+
+	public float size;
+
+	public float totalGhostAggressiveness;
+	public float killedGhostAggressiveness;
+
+	// speed can be based on time spent in the level, or perhaps health?
+
+	// dexterity based on shots dodged?
+
+	// mobility can be based on total ground covered? or total time spent moving?
+
+	// movement should be a factor of average speed, number of jumps, percentage of the map covered, starting/ending position, etc.
+}
+
 public class GhostAI : MonoBehaviour {
 
 	public GhostAIStats stats;
@@ -34,6 +70,8 @@ public class GhostAI : MonoBehaviour {
 		gameObject.AddComponent <GhostMovement>();
 
 		detectionRadius = Room.bounds.extents.x;
+
+		transform.localScale = new Vector3(stats.size, stats.size, 1);
 
 		size = GetComponent <SpriteRenderer>().bounds.extents;
 
