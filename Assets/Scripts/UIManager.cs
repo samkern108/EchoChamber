@@ -17,8 +17,11 @@ public class UIManager : MonoBehaviour, IRestartObserver, ICheckpointObserver {
 	}
 
 	public void Update() {
-		if(Input.GetKeyDown(KeyCode.Escape)) {
+		if(Input.GetKeyDown(KeyCode.R)) {
 			PressRestartButton ();
+		}
+		else if(Input.GetKeyDown(KeyCode.Escape)) {
+			Application.Quit ();
 		}
 	}
 

@@ -43,16 +43,12 @@ public class GhostAI : MonoBehaviour {
 	public GhostAIStats stats;
 
 	private GhostAttack attack;
+	private GhostMovement movement;
 
-	public GameObject projectile;
-
-	private LayerMask layerMask;
-	private Bounds floor;
+	private int layerMask;
 
 	private bool detectedPlayer = false;
 	private float detectionRadius = 4.0f;
-
-	private Vector3 startPosition, persistentTargetPosition;
 
 	private Animate animate;
 	private Vector3 size;
@@ -67,7 +63,7 @@ public class GhostAI : MonoBehaviour {
 	//		GetComponent<GhostAttack> ().Initialize (stats);
 		}
 
-		gameObject.AddComponent <GhostMovement>();
+		movement = gameObject.AddComponent <GhostMovement>();
 
 		detectionRadius = Room.bounds.extents.x;
 
@@ -75,8 +71,8 @@ public class GhostAI : MonoBehaviour {
 
 		size = GetComponent <SpriteRenderer>().bounds.extents;
 
-		startPosition = GetSpawnPosition();
-		transform.position = startPosition;
+		transform.position = GetSpawnPosition();
+		movement.startPosition = transform.position;
 
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
 
@@ -107,7 +103,7 @@ public class GhostAI : MonoBehaviour {
 			hit = Physics2D.Raycast (point, Vector2.down, 20.0f, 1 << LayerMask.NameToLayer ("Wall"));
 			if(hit.collider) {
 				point.y = hit.transform.position.y + hit.transform.GetComponent<SpriteRenderer>().bounds.extents.y + size.y;
-				floor = hit.collider.bounds;
+				movement.floor = hit.collider.bounds;
 			}
 			// Just a safeguard in case the raycast bugs out.
 			else {
@@ -134,41 +130,20 @@ public class GhostAI : MonoBehaviour {
 	void Update () {
 		RaycastHit2D hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
 		if (hit.collider.tag == "Wall" || (hit.collider.tag == "Player" && hit.distance > detectionRadius)) {
-			MoveToStart ();
 			if (detectedPlayer) {
 				detectedPlayer = false;
+				movement.SetMovementState (GhostMovementState.Idle);
 				if(attack) attack.StopShooting ();
 				animate.AnimateToColor (Palette.EnemyColor, color, .3f);
 			}
 			return;
 		} else {
-			MoveToPlayer ();
 			if (!detectedPlayer) {
 				detectedPlayer = true;
+				movement.SetMovementState (GhostMovementState.Attack);
 				if(attack) attack.StartShooting ();
 				animate.AnimateToColor (color, Palette.EnemyColor, .1f);
 			}
 		}
-	}
-
-	public float smoothDampTime = 0.2f;
-	private void MoveToPlayer() {
-		Vector3 targetPosition = PlayerController.PlayerPosition;
-		targetPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
-		targetPosition.y = transform.position.y;
-		Vector3 newPosition = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime);
-		//Vector3 newPosition = Vector3.SmoothDamp( transform.position, targetPosition, ref _smoothDampVelocity, smoothDampTime );
-		// TODO(samkern): Which looks better, smoothdamp or lerp?
-		transform.position = newPosition;
-	}
-
-	private void MoveToStart() {
-		Vector3 targetPosition = startPosition;
-		targetPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
-		targetPosition.y = transform.position.y;
-		Vector3 newPosition = Vector3.Lerp(transform.position, targetPosition, .5f * Time.deltaTime);
-		//Vector3 newPosition = Vector3.SmoothDamp( transform.position, targetPosition, ref _smoothDampVelocity, smoothDampTime );
-		// TODO(samkern): Which looks better, smoothdamp or lerp?
-		transform.position = newPosition;
 	}
 }

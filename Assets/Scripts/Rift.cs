@@ -62,7 +62,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		if (!activated) {
 			ghostStats.timeOpen = Time.time - timeOpened;
 			ghostStats.size = size;
-			GhostManager.instance.StartCapturingNewGhost (ghostStats);
+			GhostManager.instance.SpawnGhost (ghostStats);
 
 			NotificationMaster.SendCheckpointReachedNotification (Time.time - timeOpened);
 			AudioManager.PlayDotPickup ();
@@ -73,6 +73,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 	}
 
 	public void Restart() {
+		// TODO(samkern): Make removing observers safe.
 		NotificationMaster.restartObservers.Remove (this);
 		this.enabled = false;
 		animate.enabled = false;

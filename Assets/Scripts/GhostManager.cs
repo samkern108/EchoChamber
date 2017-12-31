@@ -15,28 +15,6 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 		NotificationMaster.restartObservers.Add (this);
 	}
 
-/*	public void StartCapturingNewGhost(float[] ghostPositions) {
-
-		// Create new ghost
-		GameObject ghost = GameObject.Instantiate (p_ghost);
-		ghost.transform.SetParent(transform);
-		ghost.GetComponent <Ghost>().Initialize(ghostPositions);
-		children.Add (ghost.GetComponent <Ghost>());
-
-		List<Ghost> ghostsToRemove = new List<Ghost> ();
-		// Restart ghost routines
-		foreach (Ghost child in children) {
-			if (!child) {
-				ghostsToRemove.Add (child);
-				continue;
-			}
-			child.gameObject.SetActive (true);
-			child.EnactRoutine ();
-		}
-
-		children = children.Except(ghostsToRemove).ToList();
-	}*/
-
 	// TODO(samkern): Instead, when we spawn a new enemy or kill an enemy, we can remove its aggressiveness from a running total.
 	public float TotalGhostAggressiveness() {
 		float aggressiveness = 0;
@@ -46,9 +24,7 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 		return aggressiveness;
 	}
 
-	public void StartCapturingNewGhost(GhostAIStats stats) {
-
-		// Create new ghost
+	public void SpawnGhost(GhostAIStats stats) {
 		GameObject ghost = GameObject.Instantiate (p_ghost);
 		ghost.transform.SetParent(transform);
 		ghost.GetComponent <GhostAI>().Initialize(stats);

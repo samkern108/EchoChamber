@@ -6,9 +6,6 @@ using Prime31;
 
 public class PlayerController : MonoBehaviour, IRestartObserver {
 
-	// Tells us what our collison state was in the last frame
-	public CharacterController2D.CharacterCollisionState2D flags;
-
 	// movement config
 	private float gravity = -30f;
 	private float runSpeed = 7f;
