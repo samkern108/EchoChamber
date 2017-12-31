@@ -21,7 +21,7 @@ public class EnemyManager : MonoBehaviour, IRestartObserver, IPlayerObserver, IC
 	}
 
 	private void SpawnEnemy() {
-		GameObject enemy = GameObject.Instantiate (p_enemy, this.transform);
+		GameObject.Instantiate (p_enemy, this.transform);
 	}
 
 	private static int _numEnemies;

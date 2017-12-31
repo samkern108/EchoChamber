@@ -4,28 +4,45 @@ using System;
 using UnityEngine;
 using Prime31;
 
+public class GhostAIStats {
 
-public struct GhostAIStats {
+	public float Level() {
+		return ghostsKilled;
+	}
+
+	public void Init() {
+		timeStartedLevel = Time.time;
+		ghostNum = GhostManager.ghostCounter;
+	}
+
+	public float TimeInLevel() {
+		Debug.Log ("TIL: " + (timeEndedLevel - timeStartedLevel));
+		return timeEndedLevel - timeStartedLevel;
+	}
+
+	public float Aggressiveness() {
+		return (shotsFired / TimeInLevel ()) * 2;
+	}
 
 	// aggressiveness can be measured by power level of enemies on screen compared to power level of enemies killed, enemies dodged in close quarters, shots fired, etc
 
 	// raw stats
 	public int shotsFired;
-	public int enemiesKilled;
-	public int totalEnemies;
+	public int ghostsKilled;
+	public int totalGhostsInLevel;
 
-	public float totalEnemyAggressiveness;
-	public float killedEnemyAggressiveness;
+	public float timeStartedLevel;
+	public float timeEndedLevel;
+	public int ghostNum;
+
+	public float totalGhostAggressiveness;
+	public float killedGhostAggressiveness;
 
 	// speed can be based on time spent in the level, or perhaps health?
 
 	// dexterity based on shots dodged?
 
 	// mobility can be based on total ground covered? or total time spent moving?
-
-	public float Aggressiveness() {
-		return killedEnemyAggressiveness / totalEnemyAggressiveness;
-	}
 
 	// movement should be a factor of average speed, number of jumps, percentage of the map covered, starting/ending position, etc.
 }
@@ -170,13 +187,17 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 	}
 
 	public void CheckpointActivated() {
-		ghostStats.totalEnemies = GhostManager.instance.children.Count;
+		ghostStats.timeEndedLevel = Time.time;
 		GhostManager.instance.StartCapturingNewGhost (ghostStats);
 		ghostStats = new GhostAIStats ();
+		ghostStats.Init ();
+		ghostStats.totalGhostsInLevel = GhostManager.instance.children.Count;
+		ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
 	}
 
 	public void GhostDied(GhostAIStats stats) {
-		ghostStats.enemiesKilled++;
+		ghostStats.ghostsKilled++;
+		ghostStats.killedGhostAggressiveness += stats.Aggressiveness ();
 	}
 
 	private void SpawnPlayer() {
@@ -193,10 +214,10 @@ public class PlayerController : MonoBehaviour, IRestartObserver, ICheckpointObse
 				break;
 			}
 		}
-			
-		ghostStats = new GhostAIStats ();
 
 		_animate.AnimateToColor (Palette.Invisible, Palette.PlayerColor, .5f);
+		ghostStats = new GhostAIStats ();
+		ghostStats.Init ();
 	}
 
 	public void Restart() {

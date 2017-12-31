@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 
+	public static int ghostCounter = 0;
 	public GameObject p_ghost;
 	public static GhostManager instance;
 	public List<GhostAI> children = new List<GhostAI> ();
@@ -36,6 +37,15 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 		children = children.Except(ghostsToRemove).ToList();
 	}*/
 
+	// TODO(samkern): Instead, when we spawn a new enemy or kill an enemy, we can remove its aggressiveness from a running total.
+	public float TotalGhostAggressiveness() {
+		float aggressiveness = 0;
+		foreach (GhostAI ghost in children) {
+			aggressiveness += ghost.stats.Aggressiveness ();
+		}
+		return aggressiveness;
+	}
+
 	public void StartCapturingNewGhost(GhostAIStats stats) {
 
 		// Create new ghost
@@ -43,6 +53,7 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 		ghost.transform.SetParent(transform);
 		ghost.GetComponent <GhostAI>().Initialize(stats);
 		children.Add (ghost.GetComponent <GhostAI>());
+		ghostCounter++;
 	}
 
 	public void Restart() {

@@ -6,6 +6,8 @@ public class GhostAI : MonoBehaviour {
 
 	public GhostAIStats stats;
 
+	private GhostAttack attack;
+
 	public GameObject projectile;
 
 	private LayerMask layerMask;
@@ -19,12 +21,17 @@ public class GhostAI : MonoBehaviour {
 	private Animate animate;
 	private Vector3 size;
 
+	private Color color;
+
 	public void Initialize(GhostAIStats stats) {
 		this.stats = stats;
+
 		if (stats.shotsFired > 0) {
-			gameObject.AddComponent <GhostAIShoot>();
-			GetComponent<GhostAIShoot> ().Initialize (stats);
+			attack = gameObject.AddComponent <GhostAttack>();
+	//		GetComponent<GhostAttack> ().Initialize (stats);
 		}
+
+		gameObject.AddComponent <GhostMovement>();
 
 		detectionRadius = Room.bounds.extents.x;
 
@@ -35,8 +42,16 @@ public class GhostAI : MonoBehaviour {
 
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
 
+		if (stats.Aggressiveness () == 0.0f) {
+			color = Color.white;
+		} else {
+			color = Color.black;
+			color.r = stats.Aggressiveness ();
+			color.g = stats.Aggressiveness ();
+		}
+
 		animate = GetComponent <Animate>();
-		animate.AnimateToColor (Palette.Invisible, Color.yellow, .3f);
+		animate.AnimateToColor (Palette.Invisible, color, .3f);
 	}
 
 	void Awake() {
@@ -84,17 +99,16 @@ public class GhostAI : MonoBehaviour {
 			MoveToStart ();
 			if (detectedPlayer) {
 				detectedPlayer = false;
-				animate.AnimateToColor (Palette.EnemyColor, Color.yellow, .3f);
+				if(attack) attack.StopShooting ();
+				animate.AnimateToColor (Palette.EnemyColor, color, .3f);
 			}
 			return;
 		} else {
 			MoveToPlayer ();
 			if (!detectedPlayer) {
 				detectedPlayer = true;
-				animate.AnimateToColor (Color.yellow, Palette.EnemyColor, .1f);
-
-				if (!shooting)
-					StartCoroutine ("Co_Shoot");
+				if(attack) attack.StartShooting ();
+				animate.AnimateToColor (color, Palette.EnemyColor, .1f);
 			}
 		}
 	}
@@ -118,29 +132,5 @@ public class GhostAI : MonoBehaviour {
 		//Vector3 newPosition = Vector3.SmoothDamp( transform.position, targetPosition, ref _smoothDampVelocity, smoothDampTime );
 		// TODO(samkern): Which looks better, smoothdamp or lerp?
 		transform.position = newPosition;
-	}
-
-	private bool shooting = false;
-	private float detectionRampUp = .7f;
-	private float shootCooldown = 1.0f;
-	private float projectileSpeed = 7.0f;
-	private IEnumerator Co_Shoot()
-	{
-		shooting = true;
-		yield return new WaitForSeconds (detectionRampUp);
-		while (detectedPlayer) {
-			Shoot ();
-			yield return new WaitForSeconds (shootCooldown);
-		}
-		shooting = false;
-	}
-
-	private void Shoot() {
-		AudioManager.PlayEnemyShoot ();
-		animate.AnimateToColorAndBack (Palette.EnemyColor, Color.red, .2f);
-		Vector3 direction = (PlayerController.PlayerPosition - transform.position).normalized;
-		GameObject missile = Instantiate (projectile, ProjectileManager.myTransform);
-		missile.transform.position = transform.position;
-		missile.GetComponent <Missile>().Initialize(direction, projectileSpeed);
 	}
 }
