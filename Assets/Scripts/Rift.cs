@@ -12,7 +12,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 
 	private bool activated = false;
 
-	private float size = 0.05f;
+	private float size = 0.08f;
 	private float timeOpened;
 
 	private Animate animate;
@@ -21,8 +21,6 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		timeOpened = Time.time;
 
 		ghostStats = new GhostAIStats ();
-		ghostStats.totalGhostsInLevel = GhostManager.instance.children.Count;
-		ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
 
 		NotificationMaster.restartObservers.Add (this);
 		NotificationMaster.ghostDeathObservers.Add (this);
@@ -48,11 +46,11 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		Vector3 newSize;
 		float delay;
 		while(true) {
-			delay = Random.Range (3.0f, 8.0f);
-			newSize = transform.localScale + new Vector3 (.25f, .25f, 0);
+			newSize = transform.localScale + new Vector3 (.1f, .1f, 0);
 			animate.AnimateToSize (transform.localScale, newSize, 1f);
 			// TODO(samkern): Figure out an appropriate scaling measure between rift & ghost
-			size += .05f;
+			size += .03f;
+			delay = Random.Range (3.0f, 8.0f);
 			yield return new WaitForSeconds(delay);
 		}
 	}
@@ -61,12 +59,16 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		if (!activated) {
 			ghostStats.timeOpen = Time.time - timeOpened;
 			ghostStats.size = size;
+
+			// TODO(samkern): Should we record ALL ghosts killed while the rift is active, or just some? Should they decay over time?
+			// ghosts alive during this rift's time in the level = ghosts currently alive plus ghosts murdered.
+			ghostStats.totalGhostsInLevel = (GhostManager.instance.children.Count + ghostStats.ghostsKilled);
+			ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
+
 			GhostManager.instance.SpawnGhost (ghostStats);
 
 			NotificationMaster.SendCheckpointReachedNotification (Time.time - timeOpened);
 			AudioManager.PlayDotPickup ();
-			animate.enabled = false;
-
 			Destroy (this.gameObject);
 		}
 	}

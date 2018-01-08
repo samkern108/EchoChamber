@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class GhostAIStats {
 
+	public GhostAI self;
+
 	public float Aggressiveness() {
-		Debug.Log ((ghostsKilled + 1) * (1 / (totalGhostsInLevel + 1)));
-		return (ghostsKilled + 1) * (1 / (totalGhostsInLevel + 1));
+		return totalGhostsInLevel == 0 ? 0 : ((float)ghostsKilled / (float)totalGhostsInLevel);
 	}
 		
 	public int shotsFired;
@@ -26,7 +27,7 @@ public class GhostAIStats {
 	// movement should be a factor of average speed, number of jumps, percentage of the map covered, starting/ending position, etc.
 }
 
-public class GhostAI : MonoBehaviour {
+public class GhostAI : MonoBehaviour, IPlayerObserver {
 
 	public GhostAIStats stats;
 
@@ -45,13 +46,18 @@ public class GhostAI : MonoBehaviour {
 
 	public void Initialize(GhostAIStats stats) {
 		this.stats = stats;
+		stats.self = this;
+		NotificationMaster.playerObservers.Add (this);
 
-		if (stats.shotsFired > 0) {
+		float aggro = stats.Aggressiveness ();
+
+		if (aggro > 0) {
 			attack = gameObject.AddComponent <GhostAttack>();
 	//		GetComponent<GhostAttack> ().Initialize (stats);
 		}
 
 		movement = gameObject.AddComponent <GhostMovement>();
+		movement.aggression = aggro;
 
 		detectionRadius = Room.bounds.extents.x;
 
@@ -64,12 +70,12 @@ public class GhostAI : MonoBehaviour {
 
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
 
-		if (stats.Aggressiveness () == 0.0f) {
+		if (aggro == 0.0f) {
 			color = Color.white;
 		} else {
 			color = Color.black;
-			color.r = stats.Aggressiveness ();
-			color.g = stats.Aggressiveness ();
+			color.r = aggro;
+			color.g = aggro;
 		}
 
 		animate = GetComponent <Animate>();
@@ -80,12 +86,12 @@ public class GhostAI : MonoBehaviour {
 		GetComponent <SpriteRenderer> ().color = Palette.Invisible;
 	}
 
+	RaycastHit2D hit;
 	void Update () {
-		RaycastHit2D hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
+		hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
 		if (hit.collider.tag == "Wall" || (hit.collider.tag == "Player" && hit.distance > detectionRadius)) {
 			if (detectedPlayer) {
 				detectedPlayer = false;
-				movement.SetMovementState (GhostMovementState.Idle);
 				if(attack) attack.StopShooting ();
 				animate.AnimateToColor (Palette.EnemyColor, color, .3f);
 			}
@@ -93,7 +99,6 @@ public class GhostAI : MonoBehaviour {
 		} else {
 			if (!detectedPlayer) {
 				detectedPlayer = true;
-				movement.SetMovementState (GhostMovementState.Attack);
 				if(attack) attack.StartShooting ();
 				animate.AnimateToColor (color, Palette.EnemyColor, .1f);
 			}
@@ -131,5 +136,9 @@ public class GhostAI : MonoBehaviour {
 		} while (distance < minDistance);
 
 		return point;
+	}
+
+	public void PlayerDied() {
+		this.enabled = false;
 	}
 }

@@ -6,6 +6,8 @@ using Prime31;
 
 public class PlayerController : MonoBehaviour, IRestartObserver {
 
+	private bool inputDisabled = false;
+
 	// movement config
 	private float gravity = -30f;
 	private float runSpeed = 7f;
@@ -49,6 +51,11 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 
 	void Update()
 	{
+		if (inputDisabled) {
+			_velocity = new Vector2 ();
+			return;
+		}
+
 		float x = Input.GetAxis("Horizontal");
 		float y = Input.GetAxis ("Vertical");
 
@@ -137,6 +144,9 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	}
 
 	private void SpawnPlayer() {
+		_velocity = new Vector2 ();
+
+		inputDisabled = true;
 		GetComponent <SpriteRenderer>().color = Palette.Invisible;
 
 		Vector3 newPosition = Vector3.zero;
@@ -152,6 +162,12 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		}
 
 		_animate.AnimateToColor (Palette.Invisible, Palette.PlayerColor, .5f);
+
+		Invoke ("EnableInput", .5f);
+	}
+
+	private void EnableInput() {
+		inputDisabled = false;
 	}
 
 	public void Restart() {

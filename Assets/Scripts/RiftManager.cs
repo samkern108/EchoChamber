@@ -28,7 +28,7 @@ public class RiftManager : MonoBehaviour, IRestartObserver {
 		timer += Time.deltaTime;
 		if(timer >= spawnDelay) {
 			SpawnNewRift ();
-			spawnDelay = Random.Range (1.5f, 4.0f);
+			spawnDelay = Random.Range (2.5f, 4.0f);
 			timer = 0.0f;
 		}
 	}

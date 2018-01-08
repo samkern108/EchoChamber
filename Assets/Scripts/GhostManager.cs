@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
+public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver, IGhostDeathObserver {
 
 	public GameObject p_ghost;
 	public static GhostManager instance;
@@ -12,6 +12,7 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 	public void Start() {
 		instance = this;
 		NotificationMaster.restartObservers.Add (this);
+		NotificationMaster.ghostDeathObservers.Add (this);
 	}
 
 	// TODO(samkern): Instead, when we spawn a new enemy or kill an enemy, we can remove its aggressiveness from a running total.
@@ -43,5 +44,9 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver {
 		foreach (GhostAI ai in children) {
 			ai.enabled = false;
 		}
+	}
+
+	public void GhostDied(GhostAIStats ghost) {
+		children.Remove (ghost.self);
 	}
 }
