@@ -34,6 +34,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		psSizeCurve.AddKey(0.0f, 0.0f);
 		psSizeCurve.AddKey(1.0f, 1.0f);
 
+		purpleColor = new Color (.4f, 0.0f, 1.0f);
+
 		Vector3 point;
 		float distance, minDistance;
 		do {
@@ -48,26 +50,52 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		StartCoroutine ("C_AnimateSize");
 	}
 		
-	private float psRadius = 0.0f;
+	private float psRadius = 0.05f;
 	private float endSize = .0f;
+
+	private float blueValue = 1.0f;
+	private float greenValue = 1.0f;
+	private float redValue = 0.0f;
+
+	private float speed = .05f;
+
+	private Color purpleColor;
+
 	private IEnumerator C_AnimateSize () {
 		Vector3 newSize;
 		float delay;
 		while(true) {
 			var shape = ps.shape;
 
-			psRadius += .05f;
-			endSize += .1f;
+			psRadius += .01f * speed;
+			endSize += .1f * speed;
 
 			shape.radius = psRadius;
 
 			var size = ps.sizeOverLifetime;
 			boxCollider.size = new Vector2 (psRadius, psRadius);
 
+			var psColor = ps.colorOverLifetime;
+
+			redValue += .05f * speed;
+			greenValue -= .05f * speed;
+			blueValue -= .02f * speed;
+
+			Color color = new Color(redValue, greenValue, blueValue);
+
+			Gradient gradient = new Gradient();
+			gradient.SetKeys(
+				new GradientColorKey[] { new GradientColorKey(Color.white, 0.0f), new GradientColorKey(color, .8f) },
+				new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+			);
+
+			psColor.color = new ParticleSystem.MinMaxGradient(gradient);
+
+
 			size.size = new ParticleSystem.MinMaxCurve(endSize, psSizeCurve);
 
 			// TODO(samkern): Figure out an appropriate scaling measure between rift & ghost
-			delay = Random.Range (3.0f, 8.0f);
+			delay = .1f;
 			yield return new WaitForSeconds(delay);
 		}
 	}
