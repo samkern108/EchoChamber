@@ -35,6 +35,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		psSizeCurve.AddKey(1.0f, 1.0f);
 
 		purpleColor = new Color (.4f, 0.0f, 1.0f);
+		gradient = new Gradient ();
+		alphaKeys = new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) };
 
 		Vector3 point;
 		float distance, minDistance;
@@ -60,6 +62,10 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 	private float speed = .05f;
 
 	private Color purpleColor;
+	private Color endColor;
+
+	private Gradient gradient;
+	private GradientAlphaKey[] alphaKeys;
 
 	private IEnumerator C_AnimateSize () {
 		Vector3 newSize;
@@ -81,20 +87,15 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 			greenValue -= .05f * speed;
 			blueValue -= .02f * speed;
 
-			Color color = new Color(redValue, greenValue, blueValue);
-
-			Gradient gradient = new Gradient();
+			endColor = new Color(redValue, greenValue, blueValue);
 			gradient.SetKeys(
-				new GradientColorKey[] { new GradientColorKey(Color.white, 0.0f), new GradientColorKey(color, .8f) },
-				new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) }
+				new GradientColorKey[] { new GradientColorKey(Color.white, 0.0f), new GradientColorKey(endColor, .8f) },
+				alphaKeys
 			);
 
 			psColor.color = new ParticleSystem.MinMaxGradient(gradient);
-
-
 			size.size = new ParticleSystem.MinMaxCurve(endSize, psSizeCurve);
 
-			// TODO(samkern): Figure out an appropriate scaling measure between rift & ghost
 			delay = .1f;
 			yield return new WaitForSeconds(delay);
 		}
@@ -105,7 +106,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 			ghostStats.timeOpen = Time.time - timeOpened;
 
 			// For reference, the player is .14 scale
-			ghostStats.size = psRadius;
+			// TODO(samkern): Figure out an appropriate scaling measure between rift & ghost
+			ghostStats.size = .02f + psRadius;
 
 			// TODO(samkern): Should we record ALL ghosts killed while the rift is active, or just some? Should they decay over time?
 			// ghosts alive during this rift's time in the level = ghosts currently alive plus ghosts murdered.

@@ -228,22 +228,12 @@ public class GhostAttack : MonoBehaviour {
 	}
 
 	public void StartShooting() {
-		if (!shooting)
-			StartCoroutine ("Co_Shoot");
+		CancelInvoke ();
+		Invoke ("Shoot", detectionRampUp);
 	}
 
 	public void StopShooting() {
-		shooting = false;
-	}
-
-	private IEnumerator Co_Shoot()
-	{
-		shooting = true;
-		yield return new WaitForSeconds (detectionRampUp);
-		while (shooting) {
-			Shoot ();
-			yield return new WaitForSeconds (shootCooldown);
-		}
+		CancelInvoke ();
 	}
 
 	private void Shoot() {
@@ -253,5 +243,7 @@ public class GhostAttack : MonoBehaviour {
 		GameObject missile = Instantiate (projectile, ProjectileManager.myTransform);
 		missile.transform.position = transform.position;
 		missile.GetComponent <Missile>().Initialize(direction, projectileSpeed);
+
+		Invoke ("Shoot", shootCooldown);
 	}
 }
