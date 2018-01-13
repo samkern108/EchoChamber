@@ -52,7 +52,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		StartCoroutine ("C_AnimateSize");
 	}
 		
-	private float psRadius = 0.05f;
+	private float psRadius = 0.1f;
 	private float endSize = .0f;
 
 	private float blueValue = 1.0f;
@@ -67,6 +67,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 	private Gradient gradient;
 	private GradientAlphaKey[] alphaKeys;
 
+	// sin animation? :D
+	// https://chicounity3d.wordpress.com/2014/05/23/how-to-lerp-like-a-pro/
 	private IEnumerator C_AnimateSize () {
 		Vector3 newSize;
 		float delay;
@@ -107,7 +109,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 
 			// For reference, the player is .14 scale
 			// TODO(samkern): Figure out an appropriate scaling measure between rift & ghost
-			ghostStats.size = .02f + psRadius;
+			ghostStats.size = psRadius;
 
 			// TODO(samkern): Should we record ALL ghosts killed while the rift is active, or just some? Should they decay over time?
 			// ghosts alive during this rift's time in the level = ghosts currently alive plus ghosts murdered.
