@@ -5,8 +5,6 @@ using MovementEffects;
 
 public class RiftManager : MonoBehaviour, IRestartObserver, ICheckpointObserver {
 
-	//TODO(samkern): If there are too few rifts open, we should maybe speed up spawning them?
-
 	public GameObject p_Rift;
 
 	private float spawnDelay = 0.0f;
