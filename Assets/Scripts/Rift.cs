@@ -39,12 +39,14 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		alphaKeys = new GradientAlphaKey[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) };
 
 		Vector3 point;
-		float distance, minDistance;
+		float distance, minDistance = 2.0f;
+		RaycastHit2D hit;
 		do {
 			point = Room.GetRandomPointInRoom ();
-
+			hit = Physics2D.Raycast (point, Vector3.back, 5.0f, 1 << LayerMask.NameToLayer ("Wall"));
+			if(hit.collider)
+				continue;
 			distance = Vector2.Distance (PlayerController.PlayerPosition, point);
-			minDistance = 2.0f;
 		} while (distance < minDistance);
 
 		transform.position = point;
