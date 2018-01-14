@@ -10,30 +10,30 @@ public enum GhostMovementState {
 public class GhostMovement : MonoBehaviour {
 
 	// movement config
-	private float gravity = -30f;
-	private float runSpeed = 7f;
-	private float groundDamping = 20f; // how fast do we change direction? higher means faster
-	private float jumpHeight = 1.5f;//3f;
-	private float doubleJumpHeight = 2f;
+	protected float gravity = -30f;
+	protected float runSpeed = 7f;
+	protected float groundDamping = 20f; // how fast do we change direction? higher means faster
+	protected float jumpHeight = 1.5f;//3f;
+	protected float doubleJumpHeight = 2f;
 
-	private float normalizedHorizontalSpeed = 0;
+	protected float normalizedHorizontalSpeed = 0;
 
 	// A non-flipped PlayerTemp sprite faces right (1)
-	public static int spriteFlipped = 1;
+	protected static int spriteFlipped = 1;
 
 	public float aggression;
 
-	private CharacterController2D _controller;
+	protected CharacterController2D _controller;
 	public Vector3 _velocity;
 
 	public Vector3 startPosition, targetPosition, newPosition;
 
-	delegate void MoveDelegate(RaycastHit2D hit);
-	private MoveDelegate moveDelegate;
-	private GhostMovementState state;
+	protected delegate void MoveDelegate(RaycastHit2D hit);
+	protected MoveDelegate moveDelegate;
+	protected GhostMovementState state;
 
 	public Bounds floor;
-	private int layerMask;
+	protected int layerMask;
 
 	public void Start() {
 		moveDelegate = new MoveDelegate(Idle);
@@ -41,9 +41,9 @@ public class GhostMovement : MonoBehaviour {
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
 	}
 
-	private bool meandering = false;
+	protected bool meandering = false;
 
-	private void ClearMovementState() {
+	protected void ClearMovementState() {
 		meandering = false;
 	}
 		
@@ -66,9 +66,9 @@ public class GhostMovement : MonoBehaviour {
 
 	public float smoothDampTime = 0.2f;
 
-	private bool attackingPlayer = false;
+	protected bool attackingPlayer = false;
 
-	private RaycastHit2D hit;
+	protected RaycastHit2D hit;
 	public void Update() {
 		hit = Physics2D.Linecast (transform.position, PlayerController.PlayerPosition, layerMask);
 		moveDelegate (hit);
@@ -128,7 +128,7 @@ public class GhostMovement : MonoBehaviour {
 	}
 
 
-	private void MoveToTargetClamped() {
+	protected virtual void MoveToTargetClamped() {
 		newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		newPosition.y = transform.position.y;
 		newPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime);
@@ -140,7 +140,7 @@ public class GhostMovement : MonoBehaviour {
 		_velocity = _controller.velocity;
 	}
 
-	private void MoveToTargetUnclamped() {
+	protected virtual void MoveToTargetUnclamped() {
 		if (_controller.isGrounded) {
 			newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		} else {
@@ -163,7 +163,7 @@ public class GhostMovement : MonoBehaviour {
 	// SMoooooooth Damp
 	// http://devblog.aliasinggames.com/smoothdamp/
 		
-	private void MoveToTarget() {
+	protected void MoveToTarget() {
 
 		newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		newPosition.y = transform.position.y;
@@ -177,12 +177,10 @@ public class GhostMovement : MonoBehaviour {
 			_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
 		}
 
-		// apply gravity before moving
 		_velocity.y += gravity * Time.deltaTime;
 			
 		_controller.move( _velocity * Time.deltaTime );
 
-		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
 		/*
 		if(Mathf.Abs(x) > .3)
@@ -209,8 +207,41 @@ public class GhostMovement : MonoBehaviour {
 */
 	}
 
-	private void FlipPlayer() {
+	protected void FlipPlayer() {
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
 		spriteFlipped *= -1;
+	}
+
+	/** Tries to avoid positioning the point too near the player (and perhaps too near other enemies?). */
+	public virtual Vector3 GetSpawnPosition(Vector3 size) {
+		Vector3 point;
+		float minDistance = 3.0f, distance;
+		RaycastHit2D hit;
+
+		do {
+			point = Room.GetRandomPointInRoom ();
+			hit = Physics2D.Raycast (point, Vector2.down, 20.0f, 1 << LayerMask.NameToLayer ("Wall"));
+			if(hit.collider) {
+				point.y = hit.transform.position.y + hit.transform.GetComponent<SpriteRenderer>().bounds.extents.y + size.y;
+				floor = hit.collider.bounds;
+			}
+			// Just a safeguard in case the raycast bugs out.
+			else {
+				distance = minDistance * 2;
+				continue;
+			}
+
+			hit = Physics2D.Raycast (point - new Vector3(size.x * 2, 0, 0), Vector2.left, .5f, 1 << LayerMask.NameToLayer ("Wall"));
+			if (hit.collider)
+				point.x = hit.collider.transform.position.x + hit.collider.GetComponent<SpriteRenderer> ().bounds.extents.x + size.x;
+
+			hit = Physics2D.Raycast (point + new Vector3(size.x * 2, 0, 0), Vector2.right, .5f, 1 << LayerMask.NameToLayer ("Wall"));
+			if (hit.collider)
+				point.x = hit.collider.transform.position.x - hit.collider.GetComponent<SpriteRenderer> ().bounds.extents.x - size.x;
+
+			distance = Vector2.Distance(PlayerController.PlayerPosition, point);
+		} while (distance < minDistance);
+
+		return point;
 	}
 }

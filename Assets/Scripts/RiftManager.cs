@@ -9,7 +9,7 @@ public class RiftManager : MonoBehaviour, IRestartObserver {
 
 	public GameObject p_Rift;
 
-	private float spawnDelay = .5f;
+	private float spawnDelay = 0.0f;
 	private float timer = 0.0f;
 
 	public void Start() {
@@ -21,7 +21,7 @@ public class RiftManager : MonoBehaviour, IRestartObserver {
 	}
 
 	public void Restart() {
-		spawnDelay = .5f;
+		spawnDelay = 0.0f;
 	}
 
 	public void Update() {

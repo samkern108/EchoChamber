@@ -52,8 +52,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		StartCoroutine ("C_AnimateSize");
 	}
 		
-	private float psRadius = 0.1f;
-	private float endSize = .0f;
+	private float psRadius = 0.2f;
+	private float endSize = 0.2f;
 
 	private float blueValue = 1.0f;
 	private float greenValue = 1.0f;

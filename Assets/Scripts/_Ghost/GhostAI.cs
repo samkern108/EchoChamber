@@ -56,7 +56,7 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 	//		GetComponent<GhostAttack> ().Initialize (stats);
 		}
 
-		movement = gameObject.AddComponent <GhostMovement>();
+		movement = gameObject.AddComponent <GhostMovement_Fly>();
 		movement.aggression = aggro;
 
 		detectionRadius = Room.bounds.extents.x;
@@ -65,7 +65,7 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 
 		size = GetComponent <SpriteRenderer>().bounds.extents;
 
-		transform.position = GetSpawnPosition();
+		transform.position = movement.GetSpawnPosition(size);
 		movement.startPosition = transform.position;
 
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
@@ -103,39 +103,6 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 				animate.AnimateToColor (color, Palette.EnemyColor, .1f);
 			}
 		}
-	}
-
-	/** Tries to avoid positioning the point too near the player (and perhaps too near other enemies?). */
-	private Vector3 GetSpawnPosition() {
-		Vector3 point;
-		float minDistance = 3.0f, distance;
-		RaycastHit2D hit;
-
-		do {
-			point = Room.GetRandomPointInRoom ();
-			hit = Physics2D.Raycast (point, Vector2.down, 20.0f, 1 << LayerMask.NameToLayer ("Wall"));
-			if(hit.collider) {
-				point.y = hit.transform.position.y + hit.transform.GetComponent<SpriteRenderer>().bounds.extents.y + size.y;
-				movement.floor = hit.collider.bounds;
-			}
-			// Just a safeguard in case the raycast bugs out.
-			else {
-				distance = minDistance * 2;
-				continue;
-			}
-
-			hit = Physics2D.Raycast (point - new Vector3(size.x * 2, 0, 0), Vector2.left, .5f, 1 << LayerMask.NameToLayer ("Wall"));
-			if (hit.collider)
-				point.x = hit.collider.transform.position.x + hit.collider.GetComponent<SpriteRenderer> ().bounds.extents.x + size.x;
-
-			hit = Physics2D.Raycast (point + new Vector3(size.x * 2, 0, 0), Vector2.right, .5f, 1 << LayerMask.NameToLayer ("Wall"));
-			if (hit.collider)
-				point.x = hit.collider.transform.position.x - hit.collider.GetComponent<SpriteRenderer> ().bounds.extents.x - size.x;
-
-			distance = Vector2.Distance(PlayerController.PlayerPosition, point);
-		} while (distance < minDistance);
-
-		return point;
 	}
 
 	public void PlayerDied() {
