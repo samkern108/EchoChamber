@@ -9,19 +9,15 @@ public class GhostMovement_Fly : GhostMovement {
 	}
 
 	private float sinOffset = 0.0f;
-	private float amplitude = .3f;
-	private float sinDamping = .5f;
+	private float amplitude = 1f;
+	private float sinDamping = 5f;
 
 	protected override void MoveToTargetUnclamped() {
+
+		_velocity = (targetPosition - transform.position).normalized * runSpeed;
+
 		sinOffset += (Time.deltaTime * sinDamping);
-
-		float height = (amplitude - (amplitude / 2)) * Mathf.Sin (sinOffset);
-		newPosition = PlayerController.PlayerPosition;
-		newPosition.y += height;
-
-		newPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime);
-
-		transform.position = newPosition;
+		_velocity.y += (amplitude - (amplitude / 2)) * Mathf.Sin (sinOffset);
 
 		_controller.move( _velocity * Time.deltaTime );
 		_velocity = _controller.velocity;

@@ -11,7 +11,7 @@ public class GhostMovement : MonoBehaviour {
 
 	// movement config
 	protected float gravity = -30f;
-	protected float runSpeed = 7f;
+	protected float runSpeed = 20f;
 	protected float groundDamping = 20f; // how fast do we change direction? higher means faster
 	protected float jumpHeight = 1.5f;//3f;
 	protected float doubleJumpHeight = 2f;
@@ -19,7 +19,7 @@ public class GhostMovement : MonoBehaviour {
 	protected float normalizedHorizontalSpeed = 0;
 
 	// A non-flipped PlayerTemp sprite faces right (1)
-	protected static int spriteFlipped = 1;
+	protected static int spriteFlipped = -1;
 
 	public float aggression;
 
@@ -120,28 +120,32 @@ public class GhostMovement : MonoBehaviour {
 			moveDelegate = new MoveDelegate(Idle);
 			return;	
 		}
-
-		//TODO(samkern): Make it move away from the player. =__= not just left. I'm tired.
-		targetPosition = new Vector3(transform.position.x - 2.0f, transform.position.y, 0);
+			
+		targetPosition = new Vector3(transform.position.x - (PlayerController.PlayerPosition - transform.position).normalized.x, transform.position.y, 0);
 		runSpeed = .4f;
 		MoveToTargetClamped ();
 	}
 
 
 	protected virtual void MoveToTargetClamped() {
-		newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
+		/*newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		newPosition.y = transform.position.y;
 		newPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime);
 
-		transform.position = newPosition;
+		transform.position = newPosition;*/
 
+		_velocity.x = (targetPosition - transform.position).normalized.x * runSpeed;
 		_velocity.y += gravity * Time.deltaTime;
 		_controller.move( _velocity * Time.deltaTime );
 		_velocity = _controller.velocity;
+
+		if (Mathf.Sign (_velocity.x) != Mathf.Sign(spriteFlipped)) {
+			FlipSprite ();
+		}
 	}
 
 	protected virtual void MoveToTargetUnclamped() {
-		if (_controller.isGrounded) {
+		/*if (_controller.isGrounded) {
 			newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		} else {
 			newPosition.x = targetPosition.x;
@@ -149,15 +153,21 @@ public class GhostMovement : MonoBehaviour {
 		newPosition.y = transform.position.y;
 		newPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime);
 
-		transform.position = newPosition;
+		transform.position = newPosition;*/
 
-		if (_controller.isGrounded && Mathf.Abs (newPosition.x - floor.center.x) >= (floor.extents.x - .2f)) {
+		_velocity.x = (targetPosition - transform.position).normalized.x * runSpeed;
+
+		/*if (_controller.isGrounded && Mathf.Abs (newPosition.x - floor.center.x) >= (floor.extents.x - .2f)) {
 			_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
-		}
+		}*/
 
 		_velocity.y += gravity * Time.deltaTime;
 		_controller.move( _velocity * Time.deltaTime );
 		_velocity = _controller.velocity;
+
+		if (Mathf.Sign (_velocity.x) != Mathf.Sign(spriteFlipped)) {
+			FlipSprite ();
+		}
 	}
 
 	// SMoooooooth Damp
@@ -207,7 +217,7 @@ public class GhostMovement : MonoBehaviour {
 */
 	}
 
-	protected void FlipPlayer() {
+	protected void FlipSprite() {
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );
 		spriteFlipped *= -1;
 	}

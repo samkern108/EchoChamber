@@ -56,7 +56,7 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 	//		GetComponent<GhostAttack> ().Initialize (stats);
 		}
 
-		movement = gameObject.AddComponent <GhostMovement_Fly>();
+		movement = gameObject.AddComponent <GhostMovement>();
 		movement.aggression = aggro;
 
 		detectionRadius = Room.bounds.extents.x;
