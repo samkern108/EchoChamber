@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: LitBG
-  m_Shader: {fileID: 4800000, guid: c3b468098e4584aa8b50c74f10bf5c56, type: 3}
+  m_Name: EntitiesShadow
+  m_Shader: {fileID: 4800000, guid: 1b52e199b76a743c18fb286c9027d372, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -58,7 +58,10 @@ Material:
     - PixelSnap: 0
     - _BumpScale: 1
     - _Cutoff: 0.5
+    - _DepthFactor: 1.85
+    - _DepthPower: 25
     - _DetailNormalMapScale: 1
+    - _DistanceFactor: 0.25
     - _DstBlend: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -67,6 +70,8 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _PerspectiveFactor: 5
+    - _ShadowDepth: 0.1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -74,4 +79,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DarkenColor: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _OverlayColor: {r: 1, g: 1, b: 1, a: 0}
+    - _ShadowColor: {r: 0, g: 0, b: 0, a: 0.5}

@@ -13,6 +13,11 @@ public class GhostAttack : MonoBehaviour {
 	private float projectileSpeed = 7.0f;
 	private Animate animate;
 
+	public void Initialize(GhostAIStats stats) {
+		float aggro = stats.Aggressiveness();
+		shootCooldown = (1.5f - aggro) * 2;
+	}
+
 	public void Start() {
 		animate = GetComponent<Animate> ();
 		projectile = ResourceLoader.LoadProjectile("EnemyMissile");

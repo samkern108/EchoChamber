@@ -11,17 +11,19 @@ public class GhostMovement : MonoBehaviour {
 
 	// movement config
 	protected float gravity = -30f;
-	protected float runSpeed = 20f;
 	protected float groundDamping = 20f; // how fast do we change direction? higher means faster
 	protected float jumpHeight = 1.5f;//3f;
 	protected float doubleJumpHeight = 2f;
+
+	protected float walkSpeed = 2f;
+	protected float chaseSpeed = 5f;
 
 	protected float normalizedHorizontalSpeed = 0;
 
 	// A non-flipped PlayerTemp sprite faces right (1)
 	protected static int spriteFlipped = -1;
 
-	public float aggression;
+	private float aggression;
 
 	protected CharacterController2D _controller;
 	public Vector3 _velocity;
@@ -34,6 +36,11 @@ public class GhostMovement : MonoBehaviour {
 
 	public Bounds floor;
 	protected int layerMask;
+
+	public void Initialize(GhostAIStats stats) {
+		aggression = stats.Aggressiveness ();
+		chaseSpeed *= ((aggression + .5f) / 2.0f);
+	}
 
 	public void Start() {
 		moveDelegate = new MoveDelegate(Idle);
@@ -75,42 +82,38 @@ public class GhostMovement : MonoBehaviour {
 	}
 
 	public void ChasePlayer(RaycastHit2D hit) {
-		switch (hit.collider.tag) {
-		case "Wall":
-			// If aggression is of a certain level, keep hunting?
-			break;
-		case "Player":
-			break;
+		if (hit.collider.tag == "Wall") {
+			// If aggression isn't high enough, don't keep hunting.
+			// Even if aggression is high, stop hunting after some time?
+			if (aggression < .4f)
+				moveDelegate = new MoveDelegate (Idle);
+			return;
 		}
 		targetPosition = PlayerController.PlayerPosition;
-		runSpeed = 1.0f;
-		MoveToTargetUnclamped ();
+		MoveToTargetUnclamped (chaseSpeed);
 	}
 
 	public void Idle(RaycastHit2D hit) {
-		switch (hit.collider.tag) {
-		case "Player":
-			if (aggression > 0.2f)
-				moveDelegate = new MoveDelegate (ChasePlayer);
-			else if(aggression == 0.0f)
-				moveDelegate = new MoveDelegate (RunAway);
-			return;	
+		if (hit.collider.tag == "Player") {
+			moveDelegate = new MoveDelegate (ChasePlayer);
+			return;
 		}
 
 		bool closeToTarget = Vector2.Distance (transform.position, targetPosition) < .1f;
 
+		float speed;
 		if (meandering) {
-			runSpeed = .15f;
+			speed = .15f;
 			if (closeToTarget)
 				targetPosition.x += Random.Range (-.25f, .2f);
 		} else {
-			runSpeed = .3f;
+			speed = .3f;
 			targetPosition = startPosition;
 
 			if (closeToTarget)
 				meandering = true;
 		}
-		MoveToTargetClamped ();
+		MoveToTargetClamped (speed);
 	}
 		
 	public void RunAway(RaycastHit2D hit) {
@@ -122,19 +125,18 @@ public class GhostMovement : MonoBehaviour {
 		}
 			
 		targetPosition = new Vector3(transform.position.x - (PlayerController.PlayerPosition - transform.position).normalized.x, transform.position.y, 0);
-		runSpeed = .4f;
-		MoveToTargetClamped ();
+		MoveToTargetClamped (walkSpeed);
 	}
 
 
-	protected virtual void MoveToTargetClamped() {
+	protected virtual void MoveToTargetClamped(float speed) {
 		/*newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		newPosition.y = transform.position.y;
 		newPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime);
 
 		transform.position = newPosition;*/
 
-		_velocity.x = (targetPosition - transform.position).normalized.x * runSpeed;
+		_velocity.x = (targetPosition - transform.position).normalized.x * speed;
 		_velocity.y += gravity * Time.deltaTime;
 		_controller.move( _velocity * Time.deltaTime );
 		_velocity = _controller.velocity;
@@ -144,7 +146,7 @@ public class GhostMovement : MonoBehaviour {
 		}
 	}
 
-	protected virtual void MoveToTargetUnclamped() {
+	protected virtual void MoveToTargetUnclamped(float speed) {
 		/*if (_controller.isGrounded) {
 			newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
 		} else {
@@ -155,7 +157,7 @@ public class GhostMovement : MonoBehaviour {
 
 		transform.position = newPosition;*/
 
-		_velocity.x = (targetPosition - transform.position).normalized.x * runSpeed;
+		_velocity.x = (targetPosition - transform.position).normalized.x * speed;
 
 		/*if (_controller.isGrounded && Mathf.Abs (newPosition.x - floor.center.x) >= (floor.extents.x - .2f)) {
 			_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);

@@ -111,7 +111,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 
 			// For reference, the player is .14 scale
 			// TODO(samkern): Figure out an appropriate scaling measure between rift & ghost
-			ghostStats.size = psRadius;
+			ghostStats.size = psRadius * 1.2f;
 
 			// TODO(samkern): Should we record ALL ghosts killed while the rift is active, or just some? Should they decay over time?
 			// ghosts alive during this rift's time in the level = ghosts currently alive plus ghosts murdered.

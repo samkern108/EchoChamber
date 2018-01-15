@@ -13,9 +13,11 @@ public class RiftManager : MonoBehaviour, IRestartObserver, ICheckpointObserver 
 
 	public void Start() {
 		NotificationMaster.restartObservers.Add (this);
+		NotificationMaster.checkpointObservers.Add (this);
 	}
 		
 	public void Restart() {
+		riftCount = 0;
 		spawnDelay = 0.0f;
 	}
 

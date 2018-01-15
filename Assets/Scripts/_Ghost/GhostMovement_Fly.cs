@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class GhostMovement_Fly : GhostMovement {
 
-	protected override void MoveToTargetClamped() {
-		MoveToTargetUnclamped ();
+	protected override void MoveToTargetClamped(float speed) {
+		MoveToTargetUnclamped (speed);
 	}
 
 	private float sinOffset = 0.0f;
 	private float amplitude = 1f;
 	private float sinDamping = 5f;
 
-	protected override void MoveToTargetUnclamped() {
+	protected override void MoveToTargetUnclamped(float speed) {
 
-		_velocity = (targetPosition - transform.position).normalized * runSpeed;
+		_velocity = (targetPosition - transform.position).normalized * speed;
 
 		sinOffset += (Time.deltaTime * sinDamping);
 		_velocity.y += (amplitude - (amplitude / 2)) * Mathf.Sin (sinOffset);
@@ -27,8 +27,6 @@ public class GhostMovement_Fly : GhostMovement {
 	public override Vector3 GetSpawnPosition(Vector3 size) {
 		Vector3 point;
 		float minDistance = 3.0f, distance;
-		RaycastHit2D hit;
-
 		do {
 			point = Room.GetRandomPointInRoom ();
 			distance = Vector2.Distance(PlayerController.PlayerPosition, point);

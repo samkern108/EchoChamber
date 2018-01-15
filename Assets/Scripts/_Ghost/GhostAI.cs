@@ -53,11 +53,11 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 
 		if (aggro > 0) {
 			attack = gameObject.AddComponent <GhostAttack>();
-	//		GetComponent<GhostAttack> ().Initialize (stats);
+			GetComponent<GhostAttack> ().Initialize (stats);
 		}
 
-		movement = gameObject.AddComponent <GhostMovement>();
-		movement.aggression = aggro;
+		movement = gameObject.AddComponent <GhostMovement_Fly>();
+		movement.Initialize (stats);
 
 		detectionRadius = Room.bounds.extents.x;
 
@@ -70,13 +70,9 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 
 		layerMask = 1 << LayerMask.NameToLayer ("Wall") | 1 << LayerMask.NameToLayer("Player");
 
-		if (aggro == 0.0f) {
-			color = Color.white;
-		} else {
-			color = Color.black;
-			color.r = aggro;
-			color.g = aggro;
-		}
+		GetComponent<SpriteRenderer>().sortingOrder = (int)(1.0f/size.magnitude * 1000);
+
+		AdjustColors(aggro);
 
 		animate = GetComponent <Animate>();
 		animate.AnimateToColor (Palette.Invisible, color, .3f);
@@ -103,6 +99,36 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 				animate.AnimateToColor (color, Palette.EnemyColor, .1f);
 			}
 		}
+	}
+
+	public void AdjustColors(float aggro) {
+		if (aggro == 0.0f) {
+			color = Color.white;
+		} else {
+			color = Color.black;
+			color.r = .5f + aggro;
+			color.g = 1 - aggro;
+		}
+
+		Color endColor = new Color ((float)(148.0f/255.0f), (float)(118.0f/255.0f), (float)(91.0f/255.0f));
+
+		color.r -= color.r/4.0f;
+		color.g -= color.g/4.0f;
+
+		ParticleSystem ps = GetComponentInChildren <ParticleSystem>();
+		var psColor = ps.colorOverLifetime;
+
+		Gradient gradient = new Gradient ();
+		gradient.SetKeys(
+			new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(endColor, .65f) },
+			new GradientAlphaKey[] { new GradientAlphaKey(0.0f, 0.0f), new GradientAlphaKey(1.0f, 0.15f), new GradientAlphaKey(0.0f, 1.0f) }
+		);
+			
+		psColor.color = new ParticleSystem.MinMaxGradient(gradient);
+
+		var main = ps.main;
+		main.startSizeMultiplier = size.magnitude + .6f;
+		Debug.Log (size.magnitude);
 	}
 
 	public void PlayerDied() {
