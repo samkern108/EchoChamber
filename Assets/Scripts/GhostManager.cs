@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver, IGhostDeathObserver {
 
-	public GameObject p_ghost;
+	public GameObject p_ghost_air, p_ghost_ground;
 	public static GhostManager instance;
 	public List<GhostAI> children = new List<GhostAI> ();
 
@@ -25,7 +25,16 @@ public class GhostManager : MonoBehaviour, IRestartObserver, IPlayerObserver, IG
 	}
 
 	public void SpawnGhost(GhostAIStats stats) {
-		GameObject ghost = GameObject.Instantiate (p_ghost);
+		GameObject ghost;
+		if(stats.airTime > .5f) {
+			ghost = GameObject.Instantiate (p_ghost_air);
+			ghost.AddComponent <GhostMovement_Fly>();
+		}
+		else {
+			ghost = GameObject.Instantiate (p_ghost_ground);
+			ghost.AddComponent <GhostMovement>();
+		}
+
 		ghost.transform.SetParent(transform);
 		ghost.GetComponent <GhostAI>().Initialize(stats);
 		children.Add (ghost.GetComponent <GhostAI>());

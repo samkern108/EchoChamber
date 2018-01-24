@@ -82,13 +82,14 @@ public class GhostMovement : MonoBehaviour {
 	}
 
 	public void ChasePlayer(RaycastHit2D hit) {
-		if (hit.collider.tag == "Wall") {
+		/*if (hit.collider.tag == "Wall") {
 			// If aggression isn't high enough, don't keep hunting.
 			// Even if aggression is high, stop hunting after some time?
-			if (aggression < .4f)
+			if (aggression < .4f) {
 				moveDelegate = new MoveDelegate (Idle);
-			return;
-		}
+				return;
+			}
+		}*/
 		targetPosition = PlayerController.PlayerPosition;
 		MoveToTargetUnclamped (chaseSpeed);
 	}
@@ -141,7 +142,10 @@ public class GhostMovement : MonoBehaviour {
 		_controller.move( _velocity * Time.deltaTime );
 		_velocity = _controller.velocity;
 
-		if (Mathf.Sign (_velocity.x) != Mathf.Sign(spriteFlipped)) {
+		if((Mathf.Sign(_velocity.x) > 0) && spriteFlipped == 1) {
+			FlipSprite ();
+		}
+		else if ((Mathf.Sign(_velocity.x) < 0) && spriteFlipped == -1) {
 			FlipSprite ();
 		}
 	}
@@ -167,57 +171,16 @@ public class GhostMovement : MonoBehaviour {
 		_controller.move( _velocity * Time.deltaTime );
 		_velocity = _controller.velocity;
 
-		if (Mathf.Sign (_velocity.x) != Mathf.Sign(spriteFlipped)) {
+		if((Mathf.Sign(_velocity.x) > 0) && spriteFlipped == 1) {
+			FlipSprite ();
+		}
+		else if ((Mathf.Sign(_velocity.x) < 0) && spriteFlipped == -1) {
 			FlipSprite ();
 		}
 	}
 
 	// SMoooooooth Damp
 	// http://devblog.aliasinggames.com/smoothdamp/
-		
-	protected void MoveToTarget() {
-
-		newPosition.x = Mathf.Clamp (targetPosition.x, floor.center.x - floor.extents.x, floor.center.x + floor.extents.x);
-		newPosition.y = transform.position.y;
-		newPosition = Vector3.Lerp(transform.position, newPosition, Time.deltaTime);
-
-		//Vector3 newPosition = Vector3.SmoothDamp( transform.position, targetPosition, ref _smoothDampVelocity, smoothDampTime );
-		// TODO(samkern): Which looks better, smoothdamp or lerp?
-		transform.position = newPosition;
-
-		if (_controller.isGrounded && Mathf.Abs (newPosition.x - floor.center.x) >= (floor.extents.x - .2f)) {
-			_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
-		}
-
-		_velocity.y += gravity * Time.deltaTime;
-			
-		_controller.move( _velocity * Time.deltaTime );
-
-		_velocity = _controller.velocity;
-		/*
-		if(Mathf.Abs(x) > .3)
-		{
-			normalizedHorizontalSpeed = x;
-			if (spriteFlipped * x < 0)
-				FlipPlayer ();
-		}
-		else
-			normalizedHorizontalSpeed = 0;
-
-		if (_controller.isGrounded) {
-			_velocity.y = 0;
-
-			if (jump) {
-				_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
-				AudioManager.PlayPlayerJump ();
-			}
-		}
-
-		// apply horizontal speed smoothing it. dont really do this with Lerp. Use SmoothDamp or something that provides more control
-		var smoothedMovementFactor = groundDamping;//_controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
-		_velocity.x = Mathf.Lerp( _velocity.x, normalizedHorizontalSpeed * runSpeed, Time.deltaTime * smoothedMovementFactor );
-*/
-	}
 
 	protected void FlipSprite() {
 		transform.localScale = new Vector3( -transform.localScale.x, transform.localScale.y, transform.localScale.z );

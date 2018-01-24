@@ -1345,52 +1345,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1001141036
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -0.592
-      objectReference: {fileID: 0}
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: -3.351
-      objectReference: {fileID: 0}
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: -4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4994368004293072, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_RootOrder
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 1806417626819620, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
-  m_IsPrefabParent: 0
 --- !u!1 &1003751447
 GameObject:
   m_ObjectHideFlags: 0
@@ -1785,7 +1739,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ef80ed39ab24d828f1abb010bdc61f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  p_ghost: {fileID: 1806417626819620, guid: df76e39eae00245e4ac6fe013e7021ca, type: 2}
+  p_ghost_air: {fileID: 1806417626819620, guid: df76e39eae00245e4ac6fe013e7021ca,
+    type: 2}
+  p_ghost_ground: {fileID: 1198155647543028, guid: 9ef29790e625f4b408884534cea87aa6,
+    type: 2}
   children: []
 --- !u!1 &1413361234
 GameObject:

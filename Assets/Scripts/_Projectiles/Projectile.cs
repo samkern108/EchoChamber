@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Missile : MonoBehaviour {
+public class Projectile : MonoBehaviour {
 
-	private Vector3 moveVector;
+	protected Vector3 moveVector;
 	public GameObject p_explosion;
 
 	public void Initialize(Vector3 direction, float speed) {
 		moveVector = direction * speed;
 	}
-		
+
 	void Update () {
 		transform.position += (moveVector * Time.deltaTime);
 	}

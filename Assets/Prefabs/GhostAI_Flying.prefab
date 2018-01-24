@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 114603406526964818}
   - component: {fileID: 114707794452793292}
   m_Layer: 12
-  m_Name: GhostAI
+  m_Name: GhostAI_Flying
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

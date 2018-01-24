@@ -16,6 +16,8 @@ public class GhostAIStats {
 
 	public float timeOpen;
 
+	public float airTime;
+
 	public float size;
 
 	public float totalGhostAggressiveness;
@@ -56,7 +58,7 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 			GetComponent<GhostAttack> ().Initialize (stats);
 		}
 
-		movement = gameObject.AddComponent <GhostMovement_Fly>();
+		movement = gameObject.GetComponent <GhostMovement>();
 		movement.Initialize (stats);
 
 		detectionRadius = Room.bounds.extents.x;
@@ -110,25 +112,34 @@ public class GhostAI : MonoBehaviour, IPlayerObserver {
 			color.g = 1 - aggro;
 		}
 
-		Color endColor = new Color ((float)(148.0f/255.0f), (float)(118.0f/255.0f), (float)(91.0f/255.0f));
+		ParticleSystem ps = GetComponentInChildren <ParticleSystem> ();
+		if (ps != null) {
 
-		color.r -= color.r/4.0f;
-		color.g -= color.g/4.0f;
+			Color endColor = new Color ((float)(148.0f / 255.0f), (float)(118.0f / 255.0f), (float)(91.0f / 255.0f));
 
-		ParticleSystem ps = GetComponentInChildren <ParticleSystem>();
-		var psColor = ps.colorOverLifetime;
+			color.r -= color.r / 4.0f;
+			color.g -= color.g / 4.0f;
 
-		Gradient gradient = new Gradient ();
-		gradient.SetKeys(
-			new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(endColor, .65f) },
-			new GradientAlphaKey[] { new GradientAlphaKey(0.0f, 0.0f), new GradientAlphaKey(1.0f, 0.15f), new GradientAlphaKey(0.0f, 1.0f) }
-		);
+			var psColor = ps.colorOverLifetime;
+
+			Gradient gradient = new Gradient ();
+			gradient.SetKeys (
+				new GradientColorKey[] { new GradientColorKey (color, 0.0f), new GradientColorKey (endColor, .65f) },
+				new GradientAlphaKey[] {
+					new GradientAlphaKey (0.0f, 0.0f),
+					new GradientAlphaKey (1.0f, 0.15f),
+					new GradientAlphaKey (0.0f, 1.0f)
+				}
+			);
 			
-		psColor.color = new ParticleSystem.MinMaxGradient(gradient);
+			psColor.color = new ParticleSystem.MinMaxGradient (gradient);
 
-		var main = ps.main;
-		main.startSizeMultiplier = size.magnitude + .6f;
-		Debug.Log (size.magnitude);
+			var main = ps.main;
+			main.startSizeMultiplier = size.magnitude + .6f;
+
+			var shape = ps.shape;
+			shape.radius = size.magnitude / 2.0f;
+		}
 	}
 
 	public void PlayerDied() {

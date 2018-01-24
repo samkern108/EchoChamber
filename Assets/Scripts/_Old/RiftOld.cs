@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MovementEffects;
 
-public class RiftOld : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlayerShootObserver {
+public class RiftOld : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlayerActionObserver {
 
 	GhostAIStats ghostStats;
 
@@ -14,6 +14,9 @@ public class RiftOld : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPl
 
 	private float size = 0.08f;
 	private float timeOpened;
+	private float airborneTime;
+
+	private bool playerAirborne = false;
 
 	//private Animate animate;
 
@@ -24,7 +27,7 @@ public class RiftOld : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPl
 
 		NotificationMaster.restartObservers.Add (this);
 		NotificationMaster.ghostDeathObservers.Add (this);
-		NotificationMaster.playerShootObservers.Add (this);
+		NotificationMaster.playerActionObservers.Add (this);
 
 		//animate = GetComponent <Animate>();
 
@@ -55,6 +58,12 @@ public class RiftOld : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPl
 		}
 	}
 
+	public void Update() {
+		if (playerAirborne) {
+			airborneTime += Time.deltaTime;
+		}
+	}
+
 	void OnTriggerEnter2D(Collider2D coll) {
 		if (!activated) {
 			ghostStats.timeOpen = Time.time - timeOpened;
@@ -64,6 +73,8 @@ public class RiftOld : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPl
 			// ghosts alive during this rift's time in the level = ghosts currently alive plus ghosts murdered.
 			ghostStats.totalGhostsInLevel = (GhostManager.instance.children.Count + ghostStats.ghostsKilled);
 			ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
+
+			ghostStats.airTime = airborneTime / ghostStats.timeOpen;
 
 			GhostManager.instance.SpawnGhost (ghostStats);
 
@@ -84,5 +95,13 @@ public class RiftOld : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPl
 
 	public void PlayerShoot() {
 		ghostStats.shotsFired++;
+	}
+
+	public void PlayerAirborne() {
+		playerAirborne = true;
+	}
+
+	public void PlayerGrounded() {
+		playerAirborne = false;
 	}
 }

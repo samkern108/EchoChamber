@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Explosion : MonoBehaviour {
+public class GhostMovement_Ground : GhostMovement {
 
 	// Use this for initialization
 	void Start () {
-		Invoke ("Die", 1.0f);
+		
 	}
 	
-	private void Die() {
-		Destroy (gameObject);
+	// Update is called once per frame
+	void Update () {
+		
 	}
 }

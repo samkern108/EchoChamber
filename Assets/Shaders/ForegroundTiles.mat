@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: ForegroundTiles
-  m_Shader: {fileID: 4800000, guid: 45d00317691b64346bf456eac57152bd, type: 3}
+  m_Shader: {fileID: 4800000, guid: c3b468098e4584aa8b50c74f10bf5c56, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA PIXELSNAP_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

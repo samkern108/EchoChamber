@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	public Vector3 _velocity;
 
 	private bool shooting = true, doubleJumping = false;
+	public static bool airborne = false;
 	public GameObject projectile;
 	private Vector2 playerSize, playerExtents;
 	private float projectileSpeed = 8.0f;
@@ -98,6 +99,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 			normalizedHorizontalSpeed = 0;
 
 		if (_controller.isGrounded) {
+			airborne = false;
 			doubleJumping = false;
 			_velocity.y = 0;
 
@@ -107,6 +109,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 				AudioManager.PlayPlayerJump ();
 			}
 		} else {
+			airborne = true;
 			if (!doubleJumping && jump) {
 				doubleJumping = true;
 				AudioManager.PlayPlayerJump ();

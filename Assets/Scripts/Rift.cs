@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MovementEffects;
 
-public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlayerShootObserver {
+public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlayerActionObserver {
 
 	GhostAIStats ghostStats;
 	ParticleSystem ps;
@@ -15,6 +15,9 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 	private bool activated = false;
 
 	private float timeOpened;
+
+	private float airborneTime = 0;
+	private bool playerAirborne = false;
 
 	private AnimationCurve psSizeCurve;
 
@@ -28,7 +31,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 
 		NotificationMaster.restartObservers.Add (this);
 		NotificationMaster.ghostDeathObservers.Add (this);
-		NotificationMaster.playerShootObservers.Add (this);
+		NotificationMaster.playerActionObservers.Add (this);
 
 		psSizeCurve = new AnimationCurve();
 		psSizeCurve.AddKey(0.0f, 0.0f);
@@ -52,6 +55,12 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 		transform.position = point;
 
 		StartCoroutine ("C_AnimateSize");
+	}
+
+	public void Update() {
+		if (PlayerController.airborne) {
+			airborneTime += Time.deltaTime;
+		}
 	}
 		
 	private float psRadius = 0.2f;
@@ -118,6 +127,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 			ghostStats.totalGhostsInLevel = (GhostManager.instance.children.Count + ghostStats.ghostsKilled);
 			ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
 
+			ghostStats.airTime = airborneTime / ghostStats.timeOpen;
+
 			GhostManager.instance.SpawnGhost (ghostStats);
 
 			NotificationMaster.SendCheckpointReachedNotification (Time.time - timeOpened);
@@ -137,5 +148,13 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 
 	public void PlayerShoot() {
 		ghostStats.shotsFired++;
+	}
+
+	public void PlayerAirborne() {
+		playerAirborne = true;
+	}
+
+	public void PlayerGrounded() {
+		playerAirborne = false;
 	}
 }

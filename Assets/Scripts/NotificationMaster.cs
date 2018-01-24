@@ -13,9 +13,11 @@ public interface IPlayerObserver
 	void PlayerDied();
 }
 
-public interface IPlayerShootObserver
+public interface IPlayerActionObserver
 {
 	void PlayerShoot();
+	void PlayerAirborne();
+	void PlayerGrounded();
 }
 
 public interface ICheckpointObserver
@@ -35,7 +37,7 @@ public class NotificationMaster : MonoBehaviour {
 	public static List<IPlayerObserver> playerObservers = new List<IPlayerObserver> ();
 	public static List<ICheckpointObserver> checkpointObservers = new List<ICheckpointObserver> ();
 	public static List<IGhostDeathObserver> ghostDeathObservers = new List<IGhostDeathObserver> ();
-	public static List<IPlayerShootObserver> playerShootObservers = new List<IPlayerShootObserver> ();
+	public static List<IPlayerActionObserver> playerActionObservers = new List<IPlayerActionObserver> ();
 
 	/* TODO(samkern): Possible simplification? go learn about delegates.
 	public delegate void RestartDelegate();
@@ -75,14 +77,36 @@ public class NotificationMaster : MonoBehaviour {
 	}
 
 	public static void SendPlayerShootNotification() {
-		List<IPlayerShootObserver> toRemove = new List<IPlayerShootObserver> ();
-		foreach(IPlayerShootObserver o in playerShootObservers) {
+		List<IPlayerActionObserver> toRemove = new List<IPlayerActionObserver> ();
+		foreach(IPlayerActionObserver o in playerActionObservers) {
 			if (o.Equals (null))
 				toRemove.Add (o);
 			else
 				o.PlayerShoot ();
 		}
-		playerShootObservers = playerShootObservers.Except (toRemove).ToList ();
+		playerActionObservers = playerActionObservers.Except (toRemove).ToList ();
+	}
+
+	public static void SendPlayerAirborneNotification() {
+		List<IPlayerActionObserver> toRemove = new List<IPlayerActionObserver> ();
+		foreach(IPlayerActionObserver o in playerActionObservers) {
+			if (o.Equals (null))
+				toRemove.Add (o);
+			else
+				o.PlayerAirborne ();
+		}
+		playerActionObservers = playerActionObservers.Except (toRemove).ToList ();
+	}
+
+	public static void SendPlayerGroundedNotification() {
+		List<IPlayerActionObserver> toRemove = new List<IPlayerActionObserver> ();
+		foreach(IPlayerActionObserver o in playerActionObservers) {
+			if (o.Equals (null))
+				toRemove.Add (o);
+			else
+				o.PlayerGrounded ();
+		}
+		playerActionObservers = playerActionObservers.Except (toRemove).ToList ();
 	}
 
 	public static void SendCheckpointReachedNotification(float timeOpen) {
