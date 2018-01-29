@@ -16,8 +16,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 
 	private float timeOpened;
 
-	private float airborneTime = 0;
-	private bool playerAirborne = false;
+	private float dashingTime = 0;
+	private bool playerDashing = false;
 
 	private AnimationCurve psSizeCurve;
 
@@ -58,8 +58,8 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 	}
 
 	public void Update() {
-		if (PlayerController.airborne) {
-			airborneTime += Time.deltaTime;
+		if (PlayerController.dashing) {
+			dashingTime += Time.deltaTime;
 		}
 	}
 		
@@ -127,7 +127,7 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 			ghostStats.totalGhostsInLevel = (GhostManager.instance.children.Count + ghostStats.ghostsKilled);
 			ghostStats.totalGhostAggressiveness = GhostManager.instance.TotalGhostAggressiveness ();
 
-			ghostStats.airTime = airborneTime / ghostStats.timeOpen;
+			ghostStats.airTime = dashingTime / ghostStats.timeOpen;
 
 			GhostManager.instance.SpawnGhost (ghostStats);
 
@@ -151,10 +151,10 @@ public class Rift : MonoBehaviour, IRestartObserver, IGhostDeathObserver, IPlaye
 	}
 
 	public void PlayerAirborne() {
-		playerAirborne = true;
+		playerDashing = true;
 	}
 
 	public void PlayerGrounded() {
-		playerAirborne = false;
+		playerDashing = false;
 	}
 }

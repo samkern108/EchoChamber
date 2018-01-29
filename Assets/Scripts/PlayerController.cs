@@ -9,14 +9,12 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	private bool inputDisabled = false;
 
 	// movement config
-	private float gravity = -30f;
 	private float runSpeed = 7f;
 	private float groundDamping = 20f; // how fast do we change direction? higher means faster
-	private float inAirDamping = 5f;
 	private float jumpHeight = 3f;
 	private float doubleJumpHeight = 2f;
 
-	private float normalizedHorizontalSpeed = 0;
+	private Vector2 speed = new Vector2();
 
 	// A non-flipped PlayerTemp sprite faces right (1)
 	public static int spriteFlipped = 1;
@@ -27,10 +25,11 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 	public Vector3 _velocity;
 
 	private bool shooting = true, doubleJumping = false;
-	public static bool airborne = false;
 	public GameObject projectile;
 	private Vector2 playerSize, playerExtents;
 	private float projectileSpeed = 8.0f;
+
+	public static bool dashing = false;
 
 	void Awake()
 	{
@@ -60,8 +59,8 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		float x = Input.GetAxis("Horizontal");
 		float y = Input.GetAxis ("Vertical");
 
-		bool jump = Input.GetKeyDown (KeyCode.JoystickButton18) || Input.GetKeyDown (KeyCode.UpArrow);
-		bool jumpCancel = Input.GetKeyUp (KeyCode.JoystickButton18) || Input.GetKeyUp (KeyCode.UpArrow);
+		bool dash = Input.GetKeyDown (KeyCode.JoystickButton18) || Input.GetKeyDown (KeyCode.UpArrow);
+		bool dashCancel = Input.GetKeyUp (KeyCode.JoystickButton18) || Input.GetKeyUp (KeyCode.UpArrow);
 
 		bool fire = Input.GetAxisRaw ("Fire") <= 0.0f;
 
@@ -91,48 +90,22 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 
 		if(Mathf.Abs(x) > .3)
 		{
-			normalizedHorizontalSpeed = x;
+			speed.x = x * runSpeed;
 			if (spriteFlipped * x < 0)
 				FlipPlayer ();
 		}
 		else
-			normalizedHorizontalSpeed = 0;
+			speed.x = 0;
 
-		if (_controller.isGrounded) {
-			airborne = false;
-			doubleJumping = false;
-			_velocity.y = 0;
+		if (Mathf.Abs (y) > .3) {
+			speed.y = y * runSpeed;
+		} else
+			speed.y = 0;
 
-			// we can only jump whilst grounded
-			if (jump) {
-				_velocity.y = Mathf.Sqrt (2f * jumpHeight * -gravity);
-				AudioManager.PlayPlayerJump ();
-			}
-		} else {
-			airborne = true;
-			if (!doubleJumping && jump) {
-				doubleJumping = true;
-				AudioManager.PlayPlayerJump ();
-				_velocity.y = Mathf.Sqrt (2f * doubleJumpHeight * -gravity);
-			}
-			else if (jumpCancel && (_velocity.y > 0))
-				_velocity.y *= .5f;
-		}
 
 		// apply horizontal speed smoothing it. dont really do this with Lerp. Use SmoothDamp or something that provides more control
-		var smoothedMovementFactor = groundDamping;//_controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
-		_velocity.x = Mathf.Lerp( _velocity.x, normalizedHorizontalSpeed * runSpeed, Time.deltaTime * smoothedMovementFactor );
-
-		// apply gravity before moving
-		_velocity.y += gravity * Time.deltaTime;
-
-		// if holding down bump up our movement amount and turn off one way platform detection for a frame.
-		// this lets us jump down through one way platforms
-		if( _controller.isGrounded && Input.GetKey(KeyCode.DownArrow) )
-		{
-			_velocity.y *= 3f;
-			_controller.ignoreOneWayPlatformsThisFrame = true;
-		}
+		var smoothedMovementFactor = 2 * groundDamping;//_controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
+		_velocity = Vector2.Lerp (_velocity, speed, Time.deltaTime * smoothedMovementFactor);
 
 		_controller.move( _velocity * Time.deltaTime );
 
@@ -152,7 +125,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 		inputDisabled = true;
 		GetComponent <SpriteRenderer>().color = Palette.Invisible;
 
-		Vector3 newPosition = Vector3.zero;
+		/*Vector3 newPosition = Vector3.zero;
 		RaycastHit2D hit;
 		// Uhh this is hacky but whatever
 		for(int i = 0; i < 5; i++) {
@@ -162,7 +135,7 @@ public class PlayerController : MonoBehaviour, IRestartObserver {
 				transform.position = newPosition;
 				break;
 			}
-		}
+		}*/
 
 		_animate.AnimateToColor (Palette.Invisible, Palette.PlayerColor, .5f);
 
